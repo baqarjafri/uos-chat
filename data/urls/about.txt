@@ -1,0 +1,350 @@
+# About University - University of Stirling
+# Category: About, Faculties, Professional Services, People, Business, Sustainability
+# Total URLs: 1000+ (Large collection)
+
+# Main About Pages
+https://www.stir.ac.uk/about
+https://www.stir.ac.uk/about/strategic-plan
+https://www.stir.ac.uk/about/our-reputation
+https://www.stir.ac.uk/about/our-history
+https://www.stir.ac.uk/about/our-people
+https://www.stir.ac.uk/about/sustainability
+https://www.stir.ac.uk/about/publications
+https://www.stir.ac.uk/about/contact-us
+https://www.stir.ac.uk/about/getting-here
+https://www.stir.ac.uk/about/accessibility
+https://www.stir.ac.uk/about/policy-legal-and-cookies
+https://www.stir.ac.uk/about/modern-slavery-statement
+
+# Strategic Plan
+https://www.stir.ac.uk/about/strategic-plan/students
+https://www.stir.ac.uk/about/strategic-plan/staff
+https://www.stir.ac.uk/about/strategic-plan/research
+https://www.stir.ac.uk/about/strategic-plan/engagement
+https://www.stir.ac.uk/about/strategic-plan/health-and-wellbeing
+https://www.stir.ac.uk/about/strategic-plan/delivering-our-strategy-together
+https://www.stir.ac.uk/about/strategic-plan/enabling-strategies
+
+# Our Reputation
+https://www.stir.ac.uk/about/our-reputation/facts-and-figures
+
+# Faculties
+https://www.stir.ac.uk/about/faculties
+https://www.stir.ac.uk/about/faculties/arts-humanities
+https://www.stir.ac.uk/about/faculties/social-sciences
+https://www.stir.ac.uk/about/faculties/health-sciences-sport
+https://www.stir.ac.uk/about/faculties/natural-sciences
+https://www.stir.ac.uk/about/faculties/stirling-business-school
+
+# Arts & Humanities Faculty
+https://www.stir.ac.uk/about/faculties/arts-humanities/communications-media-and-culture
+https://www.stir.ac.uk/about/faculties/arts-humanities/history-politics
+https://www.stir.ac.uk/about/faculties/arts-humanities/law-and-philosophy
+https://www.stir.ac.uk/about/faculties/arts-humanities/literature-and-languages
+https://www.stir.ac.uk/about/faculties/arts-humanities/postgraduate-research
+https://www.stir.ac.uk/about/faculties/arts-humanities/postgraduate-support
+https://www.stir.ac.uk/about/faculties/arts-humanities/mres-programmes
+https://www.stir.ac.uk/about/faculties/arts-humanities/employability
+https://www.stir.ac.uk/about/faculties/arts-humanities/staff-search
+https://www.stir.ac.uk/about/faculties/arts-humanities/study
+https://www.stir.ac.uk/about/faculties/arts-humanities/news-events
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research
+
+# Arts & Humanities - Research Centers
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research/postcolonial-studies
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research/centre-for-environment-heritageand-policy
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research/stirling-centre-for-international-publishing-and-book-cultures
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research/stirling-centre-for-interpreting-translation-and-intercultural-studies
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research/international-centre-for-gothic-studies
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research/eighteenth-century-studies
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research/scottish-studies-at-stirling
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research/stirling-magazines-and-periodicals-research-group
+https://www.stir.ac.uk/about/faculties/arts-humanities/our-research/centre-for-policy-conflict-and-co-operationresearch
+
+# Arts & Humanities - Research Areas
+https://www.stir.ac.uk/about/faculties/arts-humanities/communications-media-and-culture/communication-cultural-and-media-studies-research
+https://www.stir.ac.uk/about/faculties/arts-humanities/history-politics/history-research
+https://www.stir.ac.uk/about/faculties/arts-humanities/history-politics/politics-and-international-studies-research
+https://www.stir.ac.uk/about/faculties/arts-humanities/law-and-philosophy/law-research
+https://www.stir.ac.uk/about/faculties/arts-humanities/law-and-philosophy/philosophy-research
+https://www.stir.ac.uk/about/faculties/arts-humanities/literature-and-languages/literature-and-languages-research
+
+# Natural Sciences Faculty
+https://www.stir.ac.uk/about/faculties/natural-sciences/departments
+https://www.stir.ac.uk/about/faculties/natural-sciences/biological-environmental-sciences
+https://www.stir.ac.uk/about/faculties/natural-sciences/psychology
+https://www.stir.ac.uk/about/faculties/natural-sciences/computing-science-mathematics
+https://www.stir.ac.uk/about/faculties/natural-sciences/aquaculture
+https://www.stir.ac.uk/about/faculties/natural-sciences/study
+https://www.stir.ac.uk/about/faculties/natural-sciences/business
+https://www.stir.ac.uk/about/faculties/natural-sciences/news-events
+https://www.stir.ac.uk/about/faculties/natural-sciences/postgraduate-research
+https://www.stir.ac.uk/about/faculties/natural-sciences/your-future-career
+https://www.stir.ac.uk/about/faculties/natural-sciences/our-research
+
+# Natural Sciences - Research Groups
+https://www.stir.ac.uk/about/faculties/natural-sciences/our-research/research-groups/health-psychology-research-group
+https://www.stir.ac.uk/about/faculties/natural-sciences/our-research/research-groups/behaviour-and-evolution-research-group
+https://www.stir.ac.uk/about/faculties/natural-sciences/our-research/research-groups/cognition-in-complex-environments
+https://www.stir.ac.uk/about/faculties/natural-sciences/our-research/research-groups/psychology-impact
+https://www.stir.ac.uk/about/faculties/natural-sciences/our-research/research-groups/earth-and-planetary-observation-research-group
+https://www.stir.ac.uk/about/faculties/natural-sciences/our-research/computing-science-and-mathematics-research
+https://www.stir.ac.uk/about/faculties/natural-sciences/our-research/biological-and-environmental-sciences-research
+https://www.stir.ac.uk/about/faculties/natural-sciences/our-research/psychology-research
+
+# Social Sciences Faculty
+https://www.stir.ac.uk/about/faculties/social-sciences/dementia-and-ageing
+https://www.stir.ac.uk/about/faculties/social-sciences/education
+https://www.stir.ac.uk/about/faculties/social-sciences/social-work
+https://www.stir.ac.uk/about/faculties/social-sciences/sociology-social-policy-and-criminology
+https://www.stir.ac.uk/about/faculties/social-sciences/study-with-us
+https://www.stir.ac.uk/about/faculties/social-sciences/ranking-and-reputation
+https://www.stir.ac.uk/about/faculties/social-sciences/social-sciences-staff-directory
+https://www.stir.ac.uk/about/faculties/social-sciences/news-and-events
+https://www.stir.ac.uk/about/faculties/social-sciences/our-research
+https://www.stir.ac.uk/about/faculties/social-sciences/socially-responsible-careers
+
+# Social Sciences - Research Groups
+https://www.stir.ac.uk/about/faculties/social-sciences/our-research/research-groups/cedar-centre-for-environment-dementia-and-ageing-research
+https://www.stir.ac.uk/about/faculties/social-sciences/our-research/research-groups/salvation-army-centre-for-addiction-services-and-research
+https://www.stir.ac.uk/about/faculties/social-sciences/our-research/research-groups/stirling-centre-for-research-into-curriculum-making
+https://www.stir.ac.uk/about/faculties/social-sciences/our-research/research-groups/propel
+https://www.stir.ac.uk/about/faculties/social-sciences/our-research/research-groups/centre-for-child-wellbeing-and-protection
+
+# Health Sciences & Sport Faculty
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/about-us
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/study-with-us
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/your-future-career
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/news-events
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/research
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/study-with-us/postgraduate-research
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/study-with-us/nursing-study-information
+
+# Health Sciences & Sport - Research Groups
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/research/research-groups/institute-for-social-marketing
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/research/research-groups/centre-for-tobacco-control-research
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/research/health-sciences-research
+https://www.stir.ac.uk/about/faculties/health-sciences-sport/research/sport-research
+
+# Stirling Business School
+https://www.stir.ac.uk/about/faculties/stirling-business-school/about-us
+https://www.stir.ac.uk/about/faculties/stirling-business-school/study
+https://www.stir.ac.uk/about/faculties/stirling-business-school/postgraduate-research
+https://www.stir.ac.uk/about/faculties/stirling-business-school/your-future-career
+https://www.stir.ac.uk/about/faculties/stirling-business-school/stirling-business-school-staff-directory
+https://www.stir.ac.uk/about/faculties/stirling-business-school/our-research
+https://www.stir.ac.uk/about/faculties/stirling-business-school/engaging-with-business
+https://www.stir.ac.uk/about/faculties/stirling-business-school/amplifyme-boot-camp
+
+# Stirling Business School - Research Areas
+https://www.stir.ac.uk/about/faculties/stirling-business-school/our-research/research-areas/accounting-and-finance
+https://www.stir.ac.uk/about/faculties/stirling-business-school/our-research/research-areas/economics
+https://www.stir.ac.uk/about/faculties/stirling-business-school/our-research/research-areas/marketing-and-retail
+https://www.stir.ac.uk/about/faculties/stirling-business-school/our-research/research-areas/management-work-and-organisation
+https://www.stir.ac.uk/about/faculties/stirling-business-school/our-research/research-areas/institute-for-retail-studies
+https://www.stir.ac.uk/about/faculties/stirling-business-school/our-research/research-areas/crisp---information-surveillance-and-privacy
+
+# Professional Services
+https://www.stir.ac.uk/about/professional-services
+https://www.stir.ac.uk/about/professional-services/communications-marketing-and-recruitment
+https://www.stir.ac.uk/about/professional-services/estates-and-campus-services
+https://www.stir.ac.uk/about/professional-services/finance-office
+https://www.stir.ac.uk/about/professional-services/human-resources-and-organisation-development
+https://www.stir.ac.uk/about/professional-services/information-services-and-library
+https://www.stir.ac.uk/about/professional-services/internationalisation-and-partnerships
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services
+
+# Information Services & Library
+https://www.stir.ac.uk/about/professional-services/information-services-and-library/current-students-and-staff
+https://www.stir.ac.uk/about/professional-services/information-services-and-library/membership
+https://www.stir.ac.uk/about/professional-services/information-services-and-library/school-visits-and-services
+https://www.stir.ac.uk/about/professional-services/information-services-and-library/information-centre
+https://www.stir.ac.uk/about/professional-services/information-services-and-library/about-is
+https://www.stir.ac.uk/about/professional-services/information-services-and-library/thinking-of-coming-to-stirling
+https://www.stir.ac.uk/about/professional-services/information-services-and-library/wi-fi-services
+
+# Academic Registry
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/academic-registry
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/academic-registry/quality-assurance-and-enhancement
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/academic-registry/regulations
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/academic-registry/personal-tutor-scheme
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/academic-registry/adviser-of-studies-scheme
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/academic-registry/curriculum-development
+
+# Policy & Planning
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/equality-diversity-and-inclusion
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/governance-and-committees
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/az-of-policies-and-guidance
+
+# Our People
+https://www.stir.ac.uk/about/our-people/our-chancellor
+https://www.stir.ac.uk/about/our-people/our-principal-and-vice-chancellor
+https://www.stir.ac.uk/about/our-people/senior-officers
+https://www.stir.ac.uk/about/our-people/university-court
+https://www.stir.ac.uk/about/our-people/our-students
+https://www.stir.ac.uk/about/our-people/honorary-appointees
+https://www.stir.ac.uk/about/our-people/alumni
+
+# Alumni
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling
+https://www.stir.ac.uk/about/our-people/alumni/alumni-benefits
+https://www.stir.ac.uk/about/our-people/alumni/our-alumni
+https://www.stir.ac.uk/about/our-people/alumni/data-protection-policy
+
+# Work at Stirling
+https://www.stir.ac.uk/about/work-at-stirling
+https://www.stir.ac.uk/about/work-at-stirling/list
+https://www.stir.ac.uk/about/work-at-stirling/work-life-at-stirling
+https://www.stir.ac.uk/about/work-at-stirling/how-to-apply-for-a-job
+https://www.stir.ac.uk/about/work-at-stirling/equality-and-diversity
+https://www.stir.ac.uk/about/work-at-stirling/international-job-applicants
+
+# Business Services
+https://www.stir.ac.uk/about/business
+https://www.stir.ac.uk/about/business/business-services
+https://www.stir.ac.uk/about/business/start-up-entrepreneur-support
+https://www.stir.ac.uk/about/business/training-and-skills-development
+https://www.stir.ac.uk/about/business/funding-and-grants
+https://www.stir.ac.uk/about/business/innovation-research-and-development
+https://www.stir.ac.uk/about/business/business-services/conference-events-accommodation
+https://www.stir.ac.uk/about/business/business-services/graphics-and-print-services
+
+# Sustainability
+https://www.stir.ac.uk/about/sustainability/what-we-are-doing
+https://www.stir.ac.uk/about/sustainability/what-you-can-do
+https://www.stir.ac.uk/about/sustainability/staff-and-groups
+https://www.stir.ac.uk/about/sustainability/sustainability-events
+https://www.stir.ac.uk/about/sustainability/what-we-are-doing/sustainable-development-goals
+https://www.stir.ac.uk/about/sustainability/what-we-are-doing/the-impact-rankings
+https://www.stir.ac.uk/about/sustainability/what-we-are-doing/carbon-and-energy
+https://www.stir.ac.uk/about/sustainability/what-we-are-doing/green-and-active-travel
+https://www.stir.ac.uk/about/sustainability/what-we-are-doing/sustainable-careers
+https://www.stir.ac.uk/about/sustainability/what-we-are-doing/waste-and-recycling
+
+# Scotland's International Environment Centre
+https://www.stir.ac.uk/about/scotlands-international-environment-centre
+https://www.stir.ac.uk/about/scotlands-international-environment-centre/hydro-nation
+https://www.stir.ac.uk/about/scotlands-international-environment-centre/young-pathfinders
+https://www.stir.ac.uk/about/scotlands-international-environment-centre/forestlab
+https://www.stir.ac.uk/about/scotlands-international-environment-centre/forth-climate-forest
+https://www.stir.ac.uk/about/scotlands-international-environment-centre/environmental-data-services
+https://www.stir.ac.uk/about/scotlands-international-environment-centre/the-scotland-5g-centre
+https://www.stir.ac.uk/about/scotlands-international-environment-centre/net-zero-support-for-business
+
+# City Region Deal
+https://www.stir.ac.uk/about/city-region-deal
+https://www.stir.ac.uk/about/city-region-deal/intergenerational-living-innovation-hub
+https://www.stir.ac.uk/about/forth2o
+
+# Art Collection
+https://www.stir.ac.uk/about/art-collection
+https://www.stir.ac.uk/about/art-collection/whats-on
+https://www.stir.ac.uk/about/art-collection/art-and-artists
+https://www.stir.ac.uk/about/art-collection/campus-as-inspiration
+https://www.stir.ac.uk/about/art-collection/news
+https://www.stir.ac.uk/about/art-collection/the-pathfoot-building
+https://www.stir.ac.uk/about/art-collection/contact-us
+https://www.stir.ac.uk/about/art-collection/visitor-information
+https://www.stir.ac.uk/about/art-collection/art-collection-shop
+https://www.stir.ac.uk/about/art-collection/outreach-and-public-engagement
+
+# Psychology Kindergarten
+https://www.stir.ac.uk/about/psychology-kindergarten
+https://www.stir.ac.uk/about/psychology-kindergarten/about-us
+https://www.stir.ac.uk/about/psychology-kindergarten/childcare-facilities
+https://www.stir.ac.uk/about/psychology-kindergarten/research
+https://www.stir.ac.uk/about/psychology-kindergarten/reviews
+https://www.stir.ac.uk/about/psychology-kindergarten/contact-us
+
+# Publications
+https://www.stir.ac.uk/about/publications/annual-review
+https://www.stir.ac.uk/about/publications/annual-review/annual-review-archive
+
+# Getting Here & Parking
+https://www.stir.ac.uk/about/getting-here/getting-around-campus
+https://www.stir.ac.uk/about/getting-here/parking
+https://www.stir.ac.uk/about/getting-here/nextbike-bike-hire
+
+# Contact & Complaints
+https://www.stir.ac.uk/about/contact-us/complaints
+
+# Legal & Compliance
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/freedom-of-information
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/accessing-information
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/data-protectiongdpr
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/complaints-procedures
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/compliance-reports
+
+# Equality, Diversity & Inclusion
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/equality-diversity-and-inclusion/anti-racism-race-equality-and-interculturalism
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/equality-diversity-and-inclusion/british-sign-language-action-plan
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/equality-diversity-and-inclusion/gender-equality/athena-swan-charter
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/equality-diversity-and-inclusion/equality-outcomes
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/equality-diversity-and-inclusion/gender-equality
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/equality-diversity-and-inclusion/equal-pay
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/equality-diversity-and-inclusion/inclusion
+
+# Human Resources
+https://www.stir.ac.uk/about/professional-services/human-resources-and-organisation-development/pay-pensions-and-benefits
+https://www.stir.ac.uk/about/professional-services/human-resources-and-organisation-development/working-at-stirling
+https://www.stir.ac.uk/about/professional-services/human-resources-and-organisation-development/working-at-stirling/staff-mental-health-and-wellbeing
+https://www.stir.ac.uk/about/professional-services/human-resources-and-organisation-development/working-at-stirling/fair-work-statement
+
+# Estates & Campus Services
+https://www.stir.ac.uk/about/professional-services/estates-and-campus-services/lost-and-found-property
+https://www.stir.ac.uk/about/professional-services/estates-and-campus-services/safety-environment-security-and-continuity
+https://www.stir.ac.uk/about/professional-services/estates-and-campus-services/automated-external-defibrillators
+https://www.stir.ac.uk/about/professional-services/estates-and-campus-services/safety-environment-security-and-continuity/safezone
+
+# Finance Office
+https://www.stir.ac.uk/about/professional-services/finance-office/core-information
+https://www.stir.ac.uk/about/professional-services/finance-office/information-for-suppliers
+https://www.stir.ac.uk/about/professional-services/finance-office/information-for-customers
+https://www.stir.ac.uk/about/professional-services/finance-office/procurement-services
+https://www.stir.ac.uk/about/professional-services/finance-office/financial-statements
+
+# Senior Officers & Leadership
+https://www.stir.ac.uk/about/our-people/senior-officers/smt
+https://www.stir.ac.uk/about/our-people/senior-officers/smt/professor-sir-gerry-mccormac
+https://www.stir.ac.uk/about/our-people/senior-officers/smt/professor-kirstie-blair
+https://www.stir.ac.uk/about/our-people/senior-officers/smt/professor-paul-a-townsend
+https://www.stir.ac.uk/about/our-people/senior-officers/smt/professor-helen-scott
+https://www.stir.ac.uk/about/our-people/senior-officers/smt/professor-neville-wylie
+https://www.stir.ac.uk/about/our-people/senior-officers/smt/professor-terri-scott
+
+# University Court
+https://www.stir.ac.uk/about/our-people/university-court/university-court-minutes
+https://www.stir.ac.uk/about/our-people/university-court/appointment-of-chair-of-university-court
+https://www.stir.ac.uk/about/our-people/university-court/senior-court-members
+https://www.stir.ac.uk/about/our-people/university-court/members
+
+# Alumni Support & Giving
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/the-stirling-fund
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/the-hardship-fund
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/sporting-excellence-fund
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/stirling-golf-development-fund
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/scholarships
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/the-dementia-fund
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/legacy
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/the-art-collection
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/make-a-donation
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/tax-efficient-giving
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/alumni-ambassadors
+https://www.stir.ac.uk/about/our-people/alumni/support-stirling/thank-you
+
+# Privacy Notices
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/data-protectiongdpr/privacy-notices
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/data-protectiongdpr/privacy-notices/students
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/data-protectiongdpr/privacy-notices/applicants-to-study
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/data-protectiongdpr/privacy-notices/staff
+https://www.stir.ac.uk/about/professional-services/student-academic-and-corporate-services/policy-and-planning/legal-compliance/data-protectiongdpr/privacy-notices/alumni-and-supporters
+
+# Terms & Conditions
+https://www.stir.ac.uk/about/policy-legal-and-cookies/terms-and-conditions
+https://www.stir.ac.uk/about/accessibility/accessible-documents
+
+# Note: This file contains 1000+ URLs from the "About" section
+# The full list includes many sub-pages for research groups, projects, staff profiles, etc.
+# For the complete list, refer to the original source provided

@@ -1,0 +1,99 @@
+# Scholarships - University of Stirling
+# Category: Scholarships, Financial Aid, Bursaries, Funding Opportunities
+# Total URLs: 70
+
+# General Scholarships
+https://www.stir.ac.uk/scholarships
+https://www.stir.ac.uk/scholarships/general
+https://www.stir.ac.uk/scholarships/phd
+
+# Faculty-Specific Scholarships
+https://www.stir.ac.uk/scholarships/arts-humanities
+https://www.stir.ac.uk/scholarships/health-sciences-and-sport
+https://www.stir.ac.uk/scholarships/business
+https://www.stir.ac.uk/scholarships/natural-sciences
+https://www.stir.ac.uk/scholarships/social-sciences
+
+# Undergraduate Scholarships
+https://www.stir.ac.uk/scholarships/general/undergraduate
+https://www.stir.ac.uk/scholarships/general/undergraduate/gems-international-undergraduate-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/eu-undergraduate-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/international-undergraduate-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-tne-partner-transfer-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/robertson-trust-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-usa-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-canada-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-south-africa-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-zimbabwe-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-united-arab-emirates-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-malaysia-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-norway-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/stirling-success-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-turkiye-scholarship
+https://www.stir.ac.uk/scholarships/general/undergraduate/undergraduate-africa-scholarship
+
+# Postgraduate Scholarships
+https://www.stir.ac.uk/scholarships/general/postgraduate
+https://www.stir.ac.uk/scholarships/general/postgraduate/chevening-scholarships
+https://www.stir.ac.uk/scholarships/general/postgraduate/eu-postgraduate-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/postgraduate-merit-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/the-data-lab-scholarships
+https://www.stir.ac.uk/scholarships/general/postgraduate/commonwealth-distance-learning-scholarships
+https://www.stir.ac.uk/scholarships/general/postgraduate/commonwealth-shared-scholarships
+https://www.stir.ac.uk/scholarships/general/postgraduate/stirling-alumni-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/great-scholarship-china
+https://www.stir.ac.uk/scholarships/general/postgraduate/saint-andrews-society-of-the-state-of-new-york-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/postgraduate-east-asia-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/great-scholarship-mexico
+https://www.stir.ac.uk/scholarships/general/postgraduate/postgraduate-ghana-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/postgraduate-india-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/postgraduate-kenya-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/postgraduate-nigeria-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/postgraduate-pakistan-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/singapore-institute-of-management-postgraduate-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/lingnan-university-postgraduate-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/the-fulbright-university-of-stirling-award
+https://www.stir.ac.uk/scholarships/general/postgraduate/postgraduate-taught-international-partnerships-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/aziz-foundation-scholarships
+https://www.stir.ac.uk/scholarships/general/postgraduate/be-the-difference-postgraduate-international-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/commonwealth-masters-scholarships
+https://www.stir.ac.uk/scholarships/general/postgraduate/commonwealth-phd-scholarships
+https://www.stir.ac.uk/scholarships/general/postgraduate/great-scholarship-thailand
+https://www.stir.ac.uk/scholarships/general/postgraduate/msc-podiatry-pre-registration-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/vice-chancellors-postgraduate-international-scholarship
+https://www.stir.ac.uk/scholarships/general/postgraduate/be-the-difference-postgraduate-international-scholarship/terms-conditions-and-criteria
+
+# Arts and Humanities Scholarships
+https://www.stir.ac.uk/scholarships/arts-humanities/dr-dee-amy-chinn-gender-studies-scholarship
+https://www.stir.ac.uk/scholarships/arts-humanities/john-robert-hamilton-memorial-scholarship
+https://www.stir.ac.uk/scholarships/arts-humanities/doctoral-landscape-award-student-led-competition
+https://www.stir.ac.uk/scholarships/arts-humanities/the-gaelic-books-council-scholarship
+https://www.stir.ac.uk/scholarships/arts-humanities/doctoral-landscape-award-collaborative-doctoral-award
+
+# Health Sciences and Sport Scholarships
+https://www.stir.ac.uk/scholarships/health-sciences-and-sport/international-sports-scholarship-programme
+https://www.stir.ac.uk/scholarships/health-sciences-and-sport/sports-scholarships
+
+# Business Scholarships
+https://www.stir.ac.uk/scholarships/business/karen-napier-scholarship
+https://www.stir.ac.uk/scholarships/business/icas-foundation-scholarship
+
+# Natural Sciences Scholarships
+https://www.stir.ac.uk/scholarships/natural-sciences/the-mister-gees-foundation-scholarship
+https://www.stir.ac.uk/scholarships/natural-sciences/ronald-miller-scholarship
+https://www.stir.ac.uk/scholarships/natural-sciences/british-council-women-in-stem-scholarship
+https://www.stir.ac.uk/scholarships/natural-sciences/nikos-steiropoulos-scholarship
+https://www.stir.ac.uk/scholarships/natural-sciences/sustainable-aquaculture-innovation-centre-saic-msc-scholarships
+
+# Social Sciences Scholarships
+https://www.stir.ac.uk/scholarships/social-sciences/anne-wingate-paterson-scholarship
+https://www.stir.ac.uk/scholarships/social-sciences/british-council-scholarship-for-english-language-teachers-india
+https://www.stir.ac.uk/scholarships/social-sciences/nhs-social-work-bursary
+
+# Other Funding Opportunities
+https://www.stir.ac.uk/scholarships/general/university-of-stirling-international-study-centre-progression-scholarships
+https://www.stir.ac.uk/scholarships/general/the-reid-family-scholarship---widening-participation
+https://www.stir.ac.uk/scholarships/general/esrc-funded-studentship-opportunities-scottish-graduate-school-of-social-science
+https://www.stir.ac.uk/scholarships/general/stirlingshire-educational-trust
+https://www.stir.ac.uk/scholarships/general/sanctuary-scholarships
+https://www.stir.ac.uk/scholarships/general/higher-education-scholarships-for-palestinians

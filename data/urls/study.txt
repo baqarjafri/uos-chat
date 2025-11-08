@@ -1,0 +1,144 @@
+# Study Information - University of Stirling
+# Category: Study Options, Applications, Fees, Funding, Requirements
+# Total URLs: 113
+
+# Main Study Pages
+https://www.stir.ac.uk/study
+https://www.stir.ac.uk/study/undergraduate
+https://www.stir.ac.uk/study/postgraduate
+https://www.stir.ac.uk/study/online-learning
+https://www.stir.ac.uk/study/cpd-and-short-courses
+https://www.stir.ac.uk/study/international-partnership-courses
+
+# Visit & Open Days
+https://www.stir.ac.uk/study/visit-us
+https://www.stir.ac.uk/study/visit-us/undergraduate-open-days
+https://www.stir.ac.uk/study/visit-us/postgraduate-open-day
+https://www.stir.ac.uk/study/visit-us/university-open-days
+https://www.stir.ac.uk/study/visit-us/virtualtour
+https://www.stir.ac.uk/study/visit-us/virtualtour-cn
+https://www.stir.ac.uk/study/visit-us/undergraduate-open-days/what-happens-at-an-on-campus-open-day
+https://www.stir.ac.uk/study/visit-us/undergraduate-open-days/guide-to-open-day-for-parents-and-guardians
+https://www.stir.ac.uk/study/visit-us/campus-tour-booking-form
+https://www.stir.ac.uk/study/visit-us/applicant-and-family-information-evenings
+
+# Why Stirling
+https://www.stir.ac.uk/study/where-can-a-university-of-stirling-degree-take-you
+https://www.stir.ac.uk/study/undergraduate/why-stirling-for-undergraduate-study
+https://www.stir.ac.uk/study/undergraduate/why-stirling-for-undergraduate-study/your-study-experience-at-stirling
+https://www.stir.ac.uk/study/postgraduate/why-stirling-for-postgraduate-study
+https://www.stir.ac.uk/study/postgraduate/why-stirling-for-postgraduate-study/redefine-your-career
+
+# Undergraduate - How to Apply
+https://www.stir.ac.uk/study/undergraduate/how-to-apply
+https://www.stir.ac.uk/study/undergraduate/how-to-apply/part-time-application
+https://www.stir.ac.uk/study/undergraduate/how-to-apply/january-entry
+https://www.stir.ac.uk/study/undergraduate/how-to-apply/common-application
+https://www.stir.ac.uk/study/undergraduate/how-to-apply/planning-your-personal-statement
+https://www.stir.ac.uk/study/undergraduate/how-to-apply/after-you-apply
+https://www.stir.ac.uk/study/undergraduate/how-to-apply/ucas-extra
+
+# Undergraduate - Entry Requirements
+https://www.stir.ac.uk/study/undergraduate/entry-requirements
+https://www.stir.ac.uk/study/undergraduate/entry-requirements/united-kingdom-and-republic-of-ireland-qualifications
+https://www.stir.ac.uk/study/undergraduate/entry-requirements/credit-for-previous-qualifications
+
+# Undergraduate - Flexible Degrees
+https://www.stir.ac.uk/study/undergraduate/flexible-undergraduate-degrees
+https://www.stir.ac.uk/study/undergraduate/flexible-undergraduate-degrees/degree-flexibility
+https://www.stir.ac.uk/study/undergraduate/flexible-undergraduate-degrees/our-undergraduate-degree-structure
+https://www.stir.ac.uk/study/undergraduate/flexible-undergraduate-degrees/part-time-study-options
+
+# Undergraduate - Advice & Support
+https://www.stir.ac.uk/study/undergraduate/advice-for-parents-and-carers
+https://www.stir.ac.uk/study/undergraduate/advice-for-parents-and-carers/safety-and-welfare
+https://www.stir.ac.uk/study/undergraduate/register-for-undergraduate-updates
+https://www.stir.ac.uk/study/undergraduate/take-the-next-step
+
+# Undergraduate - Teachers & Advisers
+https://www.stir.ac.uk/study/undergraduate/teachers-lecturers-and-careers-advisers
+https://www.stir.ac.uk/study/undergraduate/teachers-lecturers-and-careers-advisers/presentations-and-workshops
+https://www.stir.ac.uk/study/undergraduate/teachers-lecturers-and-careers-advisers/events
+https://www.stir.ac.uk/study/undergraduate/teachers-lecturers-and-careers-advisers/our-recruitment-team
+https://www.stir.ac.uk/study/undergraduate/teachers-lecturers-and-careers-advisers/our-recruitment-team/scotland-widening-participation
+https://www.stir.ac.uk/study/undergraduate/teachers-lecturers-and-careers-advisers/our-recruitment-team/north-england
+https://www.stir.ac.uk/study/undergraduate/teachers-lecturers-and-careers-advisers/our-recruitment-team/south-england
+https://www.stir.ac.uk/study/undergraduate/teachers-lecturers-and-careers-advisers/our-recruitment-team/northern-ireland
+https://www.stir.ac.uk/study/undergraduate/teachers-lecturers-and-careers-advisers/our-recruitment-team/europe
+
+# Undergraduate - Widening Participation
+https://www.stir.ac.uk/study/undergraduate/widening-participation
+https://www.stir.ac.uk/study/undergraduate/widening-participation/widening-access-strategy
+https://www.stir.ac.uk/study/undergraduate/widening-participation/coming-from-school
+https://www.stir.ac.uk/study/undergraduate/widening-participation/coming-from-college
+https://www.stir.ac.uk/study/undergraduate/widening-participation/coming-from-college/articulation
+https://www.stir.ac.uk/study/undergraduate/widening-participation/coming-from-college/swap-access-courses-for-mature-students
+https://www.stir.ac.uk/study/undergraduate/widening-participation/coming-from-college/hnc-and-hnd-students
+https://www.stir.ac.uk/study/undergraduate/widening-participation/coming-from-college/other-college-courses
+https://www.stir.ac.uk/study/undergraduate/widening-participation/coming-from-college/advanced-entry
+https://www.stir.ac.uk/study/undergraduate/widening-participation/advice-and-guidance-for-mature-students
+https://www.stir.ac.uk/study/undergraduate/widening-participation/care-experienced-applicants
+https://www.stir.ac.uk/study/undergraduate/widening-participation/young-and-adult-carers
+https://www.stir.ac.uk/study/undergraduate/widening-participation/young-and-adult-carers/student-carers-policy
+https://www.stir.ac.uk/study/undergraduate/widening-participation/estranged-students
+https://www.stir.ac.uk/study/undergraduate/widening-participation/armed-forces-community
+https://www.stir.ac.uk/study/undergraduate/widening-participation/refugee-and-asylum-seekers
+https://www.stir.ac.uk/study/undergraduate/widening-participation/financial-support-for-widening-access-students
+
+# Undergraduate - Access to Degree Studies
+https://www.stir.ac.uk/study/undergraduate/access-to-degree-studies
+https://www.stir.ac.uk/study/undergraduate/access-to-degree-studies/access-to-degree-studies
+https://www.stir.ac.uk/study/undergraduate/access-to-degree-studies/access-to-nursing-studies
+https://www.stir.ac.uk/study/undergraduate/access-to-degree-studies/access-to-science-studies
+https://www.stir.ac.uk/study/undergraduate/access-to-degree-studies/how-do-i-apply
+
+# Undergraduate - Landing Pages
+https://www.stir.ac.uk/study/undergraduate/landing-pages
+
+# Postgraduate
+https://www.stir.ac.uk/study/postgraduate/how-to-apply
+https://www.stir.ac.uk/study/postgraduate/how-to-apply/what-makes-a-good-personal-statement
+https://www.stir.ac.uk/study/postgraduate/how-to-apply/january-entry-for-postgraduate-courses
+https://www.stir.ac.uk/study/postgraduate/choosing-a-course
+https://www.stir.ac.uk/study/postgraduate/flexible-learning
+https://www.stir.ac.uk/study/postgraduate/university-of-stirling-postgraduate-progression-courses
+https://www.stir.ac.uk/study/postgraduate/create-your-personalised-prospectus
+https://www.stir.ac.uk/study/postgraduate/register-for-updates
+
+# Online Learning
+https://www.stir.ac.uk/study/online-learning/online-masters-degree-courses
+https://www.stir.ac.uk/study/online-learning/online-short-courses
+
+# Fees & Funding
+https://www.stir.ac.uk/study/fees-funding
+https://www.stir.ac.uk/study/fees-funding/undergraduate-tuition-fees
+https://www.stir.ac.uk/study/fees-funding/undergraduate-funding
+https://www.stir.ac.uk/study/fees-funding/nursing-and-paramedic-degree-tuition-fees
+https://www.stir.ac.uk/study/fees-funding/postgraduate-tuition-fees
+https://www.stir.ac.uk/study/fees-funding/postgraduate-loans-and-funding
+https://www.stir.ac.uk/study/fees-funding/postgraduate-loans-and-funding/saas-postgraduate-loans
+https://www.stir.ac.uk/study/fees-funding/part-time-tuition-fees
+https://www.stir.ac.uk/study/fees-funding/international-student-tuition-fees
+https://www.stir.ac.uk/study/fees-funding/additional-university-fees
+https://www.stir.ac.uk/study/fees-funding/how-to-pay-your-fees
+https://www.stir.ac.uk/study/fees-funding/how-to-pay-your-fees/online-payment-terms-and-conditions
+https://www.stir.ac.uk/study/fees-funding/tuition-fees-policy
+
+# Important Information
+https://www.stir.ac.uk/study/important-information-for-applicants
+https://www.stir.ac.uk/study/important-information-for-applicants/terms-conditions
+https://www.stir.ac.uk/study/important-information-for-applicants/terms-conditions/2026-27-student-terms-and-conditions
+https://www.stir.ac.uk/study/important-information-for-applicants/terms-conditions/2025-26-student-terms-and-conditions
+https://www.stir.ac.uk/study/important-information-for-applicants/terms-conditions/2024-25-student-terms-and-conditions
+https://www.stir.ac.uk/study/important-information-for-applicants/terms-conditions/2023-24-student-terms-and-conditions
+https://www.stir.ac.uk/study/important-information-for-applicants/terms-conditions/2022-23-student-terms-and-conditions
+https://www.stir.ac.uk/study/important-information-for-applicants/student-code
+https://www.stir.ac.uk/study/important-information-for-applicants/admissions-policy
+https://www.stir.ac.uk/study/important-information-for-applicants/admissions-policy/2023-24-admissions-policy
+https://www.stir.ac.uk/study/important-information-for-applicants/admissions-policy/2022-23-admissions-policy
+https://www.stir.ac.uk/study/important-information-for-applicants/criminal-convictions-and-protecting-vulnerable-groups
+https://www.stir.ac.uk/study/important-information-for-applicants/international-student-visas-and-cas-issuance-guidance-for-new-students
+
+# General
+https://www.stir.ac.uk/study/download-a-prospectus
+https://www.stir.ac.uk/study/semester-dates

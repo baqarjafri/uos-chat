@@ -1,0 +1,61 @@
+# Stirling Chat MVP - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# ============================================
+# WEB SCRAPING
+# ============================================
+firecrawl-py>=0.0.16          # FireCrawl SDK for web scraping
+
+# ============================================
+# DATABASE & VECTOR STORE
+# ============================================
+psycopg2-binary>=2.9.9        # PostgreSQL adapter
+pgvector>=0.2.4               # pgvector extension for Python
+sqlalchemy>=2.0.23            # SQL toolkit and ORM
+
+# ============================================
+# LLM & EMBEDDINGS
+# ============================================
+openai>=1.35.0                # OpenAI API (for embeddings)
+anthropic>=0.25.0             # Anthropic API (Claude 3 Haiku)
+langchain>=0.1.0              # LangChain framework
+langchain-openai>=0.1.0       # LangChain OpenAI integration
+langchain-anthropic>=0.1.0    # LangChain Anthropic integration
+langchain-community>=0.0.20   # LangChain community integrations
+
+# ============================================
+# WEB FRAMEWORK
+# ============================================
+fastapi>=0.109.0              # Modern web framework
+uvicorn[standard]>=0.27.0     # ASGI server
+pydantic>=2.5.0               # Data validation
+pydantic-settings>=2.1.0      # Settings management
+
+# ============================================
+# UTILITIES
+# ============================================
+python-dotenv>=1.0.0          # Environment variable management
+tiktoken>=0.6.0               # Token counting for OpenAI models
+markdown>=3.5.0               # Markdown processing
+beautifulsoup4>=4.12.0        # HTML/XML parsing
+requests>=2.31.0              # HTTP library
+
+# ============================================
+# DATA PROCESSING
+# ============================================
+numpy>=1.26.0                 # Numerical computing
+pandas>=2.1.0                 # Data manipulation (optional, for analysis)
+
+# ============================================
+# DEVELOPMENT TOOLS
+# ============================================
+pytest>=7.4.0                 # Testing framework
+black>=23.12.0                # Code formatter
+flake8>=7.0.0                 # Linting
+ipython>=8.19.0               # Enhanced Python shell
+
+# ============================================
+# LOGGING & MONITORING
+# ============================================
+python-json-logger>=2.0.7     # JSON logging
+rich>=13.7.0                  # Beautiful terminal output

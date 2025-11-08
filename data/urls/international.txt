@@ -1,0 +1,77 @@
+# International Students - University of Stirling
+# Category: International Students, Study Abroad, Summer School, Country Information
+# Total URLs: 66
+
+# Main International Pages
+https://www.stir.ac.uk/international
+https://www.stir.ac.uk/international/international-students
+https://www.stir.ac.uk/international/study-abroad-exchange
+https://www.stir.ac.uk/international/international-summer-school
+https://www.stir.ac.uk/international/international-english-language-school
+
+# Global Position & Partnerships
+https://www.stir.ac.uk/international/global-position
+https://www.stir.ac.uk/international/global-ambition
+https://www.stir.ac.uk/international/our-partnerships
+
+# International Students - General
+https://www.stir.ac.uk/international/international-students/why-stirling
+https://www.stir.ac.uk/international/international-students/why-stirling/international-student-community
+https://www.stir.ac.uk/international/international-students/pathway-programmes
+https://www.stir.ac.uk/international/international-students/international-entry-requirements
+https://www.stir.ac.uk/international/international-students/english-language-requirements
+https://www.stir.ac.uk/international/international-students/english-language-requirements/english-language-waiver--postgraduate
+https://www.stir.ac.uk/international/international-students/english-language-requirements/english-language-waiver--undergraduate
+https://www.stir.ac.uk/international/international-students/visa
+https://www.stir.ac.uk/international/international-students/visa/graduate-visa
+https://www.stir.ac.uk/international/international-students/pre-sessional-english-language-courses
+https://www.stir.ac.uk/international/international-students/student-support
+https://www.stir.ac.uk/international/international-students/student-support/international-careers-guidance
+https://www.stir.ac.uk/international/international-students/student-support/english-language-support
+https://www.stir.ac.uk/international/international-students/international-student-funding
+https://www.stir.ac.uk/international/international-students/international-student-funding/financial-aid-for-us-students
+https://www.stir.ac.uk/international/international-students/agents-and-international-representatives
+
+# Country-Specific Information
+https://www.stir.ac.uk/international/international-students/country-specific-information
+https://www.stir.ac.uk/international/international-students/country-specific-information/africa
+https://www.stir.ac.uk/international/international-students/country-specific-information/africa/ghana
+https://www.stir.ac.uk/international/international-students/country-specific-information/africa/nigeria
+https://www.stir.ac.uk/international/international-students/country-specific-information/americas
+https://www.stir.ac.uk/international/international-students/country-specific-information/americas/usa
+https://www.stir.ac.uk/international/international-students/country-specific-information/americas/canada
+https://www.stir.ac.uk/international/international-students/country-specific-information/australasia
+https://www.stir.ac.uk/international/international-students/country-specific-information/central-asia
+https://www.stir.ac.uk/international/international-students/country-specific-information/east-asia
+https://www.stir.ac.uk/international/international-students/country-specific-information/east-asia/china
+https://www.stir.ac.uk/international/international-students/country-specific-information/europe
+https://www.stir.ac.uk/international/international-students/country-specific-information/middle-east
+https://www.stir.ac.uk/international/international-students/country-specific-information/south-asia
+https://www.stir.ac.uk/international/international-students/country-specific-information/south-asia/india
+https://www.stir.ac.uk/international/international-students/country-specific-information/south-asia/pakistan
+https://www.stir.ac.uk/international/international-students/country-specific-information/south-east-asia
+https://www.stir.ac.uk/international/international-students/country-specific-information/already-in-the-uk
+https://www.stir.ac.uk/international/international-students/country-specific-information/data/usa
+
+# International Summer School
+https://www.stir.ac.uk/international/international-summer-school/what-can-i-study
+https://www.stir.ac.uk/international/international-summer-school/fees
+https://www.stir.ac.uk/international/international-summer-school/whats-included
+https://www.stir.ac.uk/international/international-summer-school/how-to-apply-for-international-summer-school
+https://www.stir.ac.uk/international/international-summer-school/why-stirling-summer-school
+
+# Study Abroad & Exchange - Want to Study Abroad
+https://www.stir.ac.uk/international/study-abroad-exchange/want-to-study-abroad
+https://www.stir.ac.uk/international/study-abroad-exchange/want-to-study-abroad/what-you-need-to-know
+https://www.stir.ac.uk/international/study-abroad-exchange/want-to-study-abroad/make-the-most-of-your-time-abroad
+https://www.stir.ac.uk/international/study-abroad-exchange/want-to-study-abroad/destinations
+https://www.stir.ac.uk/international/study-abroad-exchange/want-to-study-abroad/destinations/european-partners
+https://www.stir.ac.uk/international/study-abroad-exchange/want-to-study-abroad/destinations/worldwide-partners
+
+# Study Abroad & Exchange - Coming to Stirling
+https://www.stir.ac.uk/international/study-abroad-exchange/coming-to-stirling
+https://www.stir.ac.uk/international/study-abroad-exchange/coming-to-stirling/what-can-i-study
+https://www.stir.ac.uk/international/study-abroad-exchange/coming-to-stirling/how-much-does-it-cost
+https://www.stir.ac.uk/international/study-abroad-exchange/coming-to-stirling/how-to-apply
+https://www.stir.ac.uk/international/study-abroad-exchange/coming-to-stirling/how-to-apply/our-study-abroad-providers
+https://www.stir.ac.uk/international/study-abroad-exchange/coming-to-stirling/how-to-apply/study-abroad-english-language-requirements
