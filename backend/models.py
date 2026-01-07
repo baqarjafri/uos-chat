@@ -32,9 +32,10 @@ class ChatRequest(BaseModel):
 
 
 class Source(BaseModel):
-    """Source reference model"""
+    """Source reference model with rich metadata"""
     title: str
     url: str
+    category: Optional[str] = None
     relevance_score: Optional[float] = None
 
 

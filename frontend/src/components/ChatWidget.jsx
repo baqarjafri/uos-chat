@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, GraduationCap, ExternalLink, Minimize2, Maximize2 } from 'lucide-react'
+import { MessageCircle, X, Send, GraduationCap, ExternalLink, Minimize2, Maximize2, BookOpen, DollarSign, FileText, Home, Award, Building2, Globe, FileQuestion } from 'lucide-react'
 import axios from 'axios'
 import { API_ENDPOINTS, CHAT_CONFIG } from '../config'
 import FeedbackModal from './FeedbackModal'
@@ -101,6 +101,12 @@ export default function ChatWidget() {
       }])
     } finally {
       setIsLoading(false)
+      // Auto-focus input after bot responds so user can continue typing
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      }, 100)
     }
   }
 
@@ -111,17 +117,41 @@ export default function ChatWidget() {
     }
   }
 
-  // Helper function to render inline bold text
-  const renderInlineBold = (text) => {
+  // Helper function to render formatted text (bold and links)
+  const renderFormattedText = (text) => {
     if (!text) return text;
-    const parts = text.split(/(\*\*.*?\*\*)/g);
+    
+    // Split on both **bold** and [link](url) patterns
+    const parts = text.split(/(\*\*.*?\*\*|\[.*?\]\(.*?\))/g);
+    
     return parts.map((part, j) => {
+      // Handle bold text
       if (part.startsWith('**') && part.endsWith('**')) {
         return <strong key={j} className="font-semibold">{part.slice(2, -2)}</strong>;
       }
+      
+      // Handle markdown links [text](url)
+      const linkMatch = part.match(/^\[(.*?)\]\((.*?)\)$/);
+      if (linkMatch) {
+        return (
+          <a 
+            key={j}
+            href={linkMatch[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green-600 hover:text-green-700 underline decoration-green-400/50 underline-offset-2 font-medium transition-colors"
+          >
+            {linkMatch[1]}
+          </a>
+        );
+      }
+      
       return part;
     });
   };
+  
+  // Alias for backward compatibility
+  const renderInlineBold = renderFormattedText;
 
   const handleEndChat = async () => {
     if (!sessionId) {
@@ -360,30 +390,62 @@ export default function ChatWidget() {
                     })}
                   </div>
                   
-                  {/* Sources - Improved Design */}
+                  {/* Related Pages - World-Class Design */}
                   {message.sources && message.sources.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <div className="flex items-center space-x-2 mb-3">
-                        <ExternalLink className="w-4 h-4 text-green-600" />
-                        <span className="text-sm font-semibold text-gray-700">Learn more</span>
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="flex items-center gap-2 mb-3">
+                        <BookOpen className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-semibold text-gray-700">Related Pages</span>
                       </div>
                       <div className="space-y-2">
-                        {message.sources.map((source, idx) => (
-                          <a
-                            key={idx}
-                            href={source.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center p-2.5 bg-gray-50 hover:bg-green-50 rounded-xl text-sm text-gray-700 hover:text-green-700 transition-all group border border-transparent hover:border-green-200"
-                          >
-                            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm mr-3 group-hover:bg-green-100 transition-colors">
-                              <ExternalLink className="w-4 h-4 text-green-600" />
-                            </span>
-                            <span className="flex-1 font-medium truncate">
-                              {source.url.replace('https://www.stir.ac.uk/', '').split('/').filter(Boolean).join(' › ') || 'University of Stirling'}
-                            </span>
-                          </a>
-                        ))}
+                        {message.sources.slice(0, 3).map((source, idx) => {
+                          // Get category-specific icon
+                          const getCategoryIcon = (category) => {
+                            const iconClass = "w-4 h-4 text-green-600";
+                            switch(category?.toLowerCase()) {
+                              case 'courses': return <GraduationCap className={iconClass} />;
+                              case 'fees': return <DollarSign className={iconClass} />;
+                              case 'admissions': return <FileText className={iconClass} />;
+                              case 'accommodation': return <Home className={iconClass} />;
+                              case 'scholarships': return <Award className={iconClass} />;
+                              case 'campus': return <Building2 className={iconClass} />;
+                              case 'international': return <Globe className={iconClass} />;
+                              default: return <FileQuestion className={iconClass} />;
+                            }
+                          };
+                          
+                          // Generate short path for display
+                          const getShortPath = (url) => {
+                            const path = url.replace('https://www.stir.ac.uk/', '').replace('https://stir.ac.uk/', '');
+                            const segments = path.split('/').filter(Boolean);
+                            return segments.slice(0, 2).join(' › ') || 'stir.ac.uk';
+                          };
+                          
+                          return (
+                            <a
+                              key={idx}
+                              href={source.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block p-3 bg-gradient-to-r from-gray-50 to-white hover:from-green-50 hover:to-white rounded-xl border border-gray-100 hover:border-green-200 hover:shadow-sm transition-all duration-200 group"
+                            >
+                              <div className="flex items-start gap-3">
+                                <span className="flex-shrink-0 w-9 h-9 rounded-lg bg-green-50 group-hover:bg-green-100 flex items-center justify-center transition-colors">
+                                  {getCategoryIcon(source.category)}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-gray-800 group-hover:text-green-700 transition-colors line-clamp-1">
+                                    {source.title || 'University of Stirling'}
+                                  </p>
+                                  <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
+                                    <span className="truncate">stir.ac.uk › {getShortPath(source.url)}</span>
+                                  </p>
+                                </div>
+                                <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-green-500 flex-shrink-0 mt-0.5 transition-colors" />
+                              </div>
+                            </a>
+                          );
+                        })}
                       </div>
                     </div>
                   )}

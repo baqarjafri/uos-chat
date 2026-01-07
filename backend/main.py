@@ -204,21 +204,23 @@ async def chat(request: ChatRequest, http_request: Request):
             ip_address=ip_address
         )
         
-        # Format sources
+        # Format sources with rich metadata
         sources = []
         for src in response.get("sources", []):
             if isinstance(src, str):
-                # Source is a URL string
+                # Source is a URL string (legacy format)
                 sources.append(Source(
                     title="Source",
                     url=src,
+                    category=None,
                     relevance_score=None
                 ))
             elif isinstance(src, dict):
-                # Source is a dict
+                # Source is a dict with rich metadata
                 sources.append(Source(
                     title=src.get("title", "Source"),
                     url=src.get("url", ""),
+                    category=src.get("category"),
                     relevance_score=src.get("relevance_score")
                 ))
             else:

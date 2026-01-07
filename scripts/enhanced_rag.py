@@ -31,12 +31,13 @@ import anthropic
 
 @dataclass
 class SearchResult:
-    """Individual search result"""
+    """Individual search result with rich metadata"""
     chunk_id: int
     document_id: int
     content: str
     heading_context: str
     source_url: str
+    source_title: str
     category: str
     similarity_score: float
     keyword_score: float = 0.0
@@ -231,6 +232,7 @@ class HybridSearch:
                 c.content,
                 c.heading_context,
                 d.url as source_url,
+                d.title as source_title,
                 d.category,
                 1 - (c.embedding <=> %s::vector) as similarity_score
             FROM chunks c
@@ -247,6 +249,7 @@ class HybridSearch:
                 content=row['content'],
                 heading_context=row['heading_context'] or '',
                 source_url=row['source_url'],
+                source_title=row['source_title'] or '',
                 category=row['category'],
                 similarity_score=float(row['similarity_score'])
             ))
@@ -265,6 +268,7 @@ class HybridSearch:
                 c.content,
                 c.heading_context,
                 d.url as source_url,
+                d.title as source_title,
                 d.category,
                 ts_rank(
                     to_tsvector('english', c.content || ' ' || COALESCE(c.heading_context, '')),
@@ -286,6 +290,7 @@ class HybridSearch:
                 content=row['content'],
                 heading_context=row['heading_context'] or '',
                 source_url=row['source_url'],
+                source_title=row['source_title'] or '',
                 category=row['category'],
                 similarity_score=0.0,  # No vector score for keyword results
                 keyword_score=float(row['keyword_score'])
@@ -452,14 +457,25 @@ class AnswerGenerator:
         response = self.client.messages.create(
             model="claude-sonnet-4-20250514",
             max_tokens=500,
+            temperature=0.7,  # Natural conversational tone (default is 1.0)
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}]
         )
         
         answer = response.content[0].text
         
-        # Extract unique sources
-        sources = list(set(r.source_url for r in search_results))
+        # Extract unique sources with rich metadata (title, url, category)
+        # Deduplicate by URL while preserving order by relevance (final_score)
+        seen_urls = set()
+        sources = []
+        for r in sorted(search_results, key=lambda x: x.final_score, reverse=True):
+            if r.source_url not in seen_urls:
+                seen_urls.add(r.source_url)
+                sources.append({
+                    "url": r.source_url,
+                    "title": r.source_title or self._generate_title_from_url(r.source_url),
+                    "category": r.category or "general"
+                })
         
         # Clean up answer - remove any source sections the AI might have added
         import re
@@ -538,8 +554,18 @@ RESPONSE STYLE (Critical):
 
 CORE RULES:
 1. Answer using ONLY the provided context - be factual
-2. Never include URLs (system adds them automatically)
-3. Never assume student's background or nationality
+2. URL HANDLING:
+   - By default, DON'T include URLs in your response (system shows them in "Related Pages" section)
+   - EXCEPTION: If user explicitly asks for "link", "page", "URL", "website", or "where can I find":
+     • Include up to 2 most relevant links INLINE using markdown format: [Page Title](url)
+     • Example: "Here's the [MSc AI course page](https://www.stir.ac.uk/courses/pg/artificial-intelligence/) with all the details."
+     • Make the link text descriptive and natural, not just "click here"
+3. NEVER assume or guess:
+   - Student's background or nationality
+   - Whether they're undergraduate or postgraduate
+   - Their student type (UK, international, Scottish)
+   - Any personal details not explicitly stated
+   Always ASK if you don't know - don't make educated guesses!
 4. Stay focused on University of Stirling topics
 
 WHEN YOU NEED MORE INFO:
@@ -630,6 +656,43 @@ GOOD EXAMPLES (Do this):
         prompt_parts.append("Answer the question using the context above. Maintain conversation flow if there's history.")
         
         return "\n".join(prompt_parts)
+    
+    def _generate_title_from_url(self, url: str) -> str:
+        """Generate a human-readable title from URL path"""
+        # Remove base URL and get path segments
+        path = url.replace('https://www.stir.ac.uk/', '').replace('https://stir.ac.uk/', '')
+        segments = [s for s in path.split('/') if s]
+        
+        if not segments:
+            return "University of Stirling"
+        
+        # Common path mappings for better titles
+        title_mappings = {
+            'courses': 'Courses',
+            'pg': 'Postgraduate',
+            'ug': 'Undergraduate',
+            'fees': 'Tuition Fees',
+            'scholarships': 'Scholarships',
+            'accommodation': 'Accommodation',
+            'admissions': 'Admissions',
+            'international': 'International Students',
+            'about': 'About Stirling',
+            'research': 'Research',
+            'student-life': 'Student Life',
+            'campus': 'Campus',
+        }
+        
+        # Build title from path segments
+        title_parts = []
+        for segment in segments[-2:]:  # Use last 2 segments for concise title
+            # Check if we have a mapping
+            if segment.lower() in title_mappings:
+                title_parts.append(title_mappings[segment.lower()])
+            else:
+                # Convert slug to title case
+                title_parts.append(segment.replace('-', ' ').replace('_', ' ').title())
+        
+        return ' - '.join(title_parts) if title_parts else "University of Stirling"
     
     def _generate_no_results_response(self, query: str, conversation_history: List[Dict] = None) -> RAGResponse:
         """Generate response when no good results found - ask clarifying questions first"""

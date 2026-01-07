@@ -384,6 +384,23 @@ class RAGAgent:
                 "next_action": "end"
             }
         
+        # Check if user just provided their name (after we asked for it)
+        # This guarantees consistent behavior - no LLM guessing
+        if self._is_name_only_response(state):
+            user_name = state.get("user_name", "")
+            name_to_use = user_name if user_name else state.get("user_input", "").split()[0].title()
+            greeting_response = f"""Nice to meet you, {name_to_use}! 👋
+
+What brings you to Stirling today? Are you looking at:
+- **Undergraduate** programs (Bachelor's degrees)
+- **Postgraduate** programs (Master's, PhD)
+- Or something else?"""
+            return {
+                **state,
+                "answer": greeting_response,
+                "next_action": "end"
+            }
+        
         # Build enhanced query by combining current input with full conversation context
         # This ensures follow-up questions include program names, student type, and topics
         enhanced_query = self._build_enhanced_query(state)
@@ -472,6 +489,40 @@ I'm here to help with courses, admissions, fees, scholarships - anything you nee
         else:
             # Ask for name in greeting (hybrid approach)
             return """Hey! 👋 Welcome to Stirling University! May I know your name?"""
+    
+    def _is_name_only_response(self, state: ConversationState) -> bool:
+        """
+        Check if user just provided their name after we asked for it.
+        This prevents the LLM from making assumptions about the user.
+        
+        Simple logic: Early in conversation + short input + name detected + no question words
+        """
+        user_input = state.get("user_input", "").strip()
+        user_name = state.get("user_name")
+        turn_count = state.get("turn_count", 0)
+        
+        # Must have a name detected
+        if not user_name:
+            return False
+        
+        # Only applies early in conversation (turns 1-2, after initial greeting)
+        if turn_count > 2:
+            return False
+        
+        # User input should be short (just a name, 1-3 words)
+        if len(user_input.split()) > 3:
+            return False
+        
+        # Check if input looks like just a name (no question words or action words)
+        question_words = ['what', 'how', 'when', 'where', 'why', 'can', 'do', 'is', 'are', 
+                          'tell', 'show', 'help', 'about', 'fee', 'cost', 'require', 'apply']
+        input_lower = user_input.lower()
+        if any(word in input_lower for word in question_words):
+            return False
+        
+        # If we get here: early turn, short input, name detected, no question words
+        # This is likely just a name response
+        return True
 
 
 # ============================================
@@ -1097,11 +1148,20 @@ class ConversationalRAGSystem:
             confidence=final_state.get("confidence")
         )
         
+        # Extract URLs from sources (sources can be list of dicts or list of strings)
+        raw_sources = final_state.get("sources", [])
+        source_urls = []
+        for src in raw_sources:
+            if isinstance(src, dict):
+                source_urls.append(src.get("url", ""))
+            elif isinstance(src, str):
+                source_urls.append(src)
+        
         self.conversation_manager.save_message(
             conversation_id=session["conversation_id"],
             role="assistant",
             content=final_state["answer"],
-            sources=final_state.get("sources", []),
+            sources=source_urls,
             processing_time_ms=int(processing_time)
         )
         
