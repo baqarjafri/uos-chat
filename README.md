@@ -52,7 +52,7 @@ npm run dev
 
 ---
 
-## Quick Start Commands (Copy-Paste)
+## Quick Start Command (Copy-Paste)
 
 **Terminal 1 - Backend:**
 
