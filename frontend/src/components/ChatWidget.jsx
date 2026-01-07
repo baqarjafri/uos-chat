@@ -121,33 +121,63 @@ export default function ChatWidget() {
   const renderFormattedText = (text) => {
     if (!text) return text;
     
-    // Split on both **bold** and [link](url) patterns
-    const parts = text.split(/(\*\*.*?\*\*|\[.*?\]\(.*?\))/g);
+    // First, handle markdown links [text](url) - convert to clickable links
+    // Use a more robust regex that handles URLs with special characters
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const boldRegex = /\*\*([^*]+)\*\*/g;
     
-    return parts.map((part, j) => {
-      // Handle bold text
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={j} className="font-semibold">{part.slice(2, -2)}</strong>;
+    // Process the text to find all matches and their positions
+    const elements = [];
+    let lastIndex = 0;
+    let match;
+    
+    // Create a combined regex to find both patterns
+    const combinedRegex = /(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g;
+    
+    while ((match = combinedRegex.exec(text)) !== null) {
+      // Add text before the match
+      if (match.index > lastIndex) {
+        elements.push(text.slice(lastIndex, match.index));
       }
       
-      // Handle markdown links [text](url)
-      const linkMatch = part.match(/^\[(.*?)\]\((.*?)\)$/);
+      const matchedText = match[0];
+      
+      // Check if it's a link
+      const linkMatch = matchedText.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
       if (linkMatch) {
-        return (
+        elements.push(
           <a 
-            key={j}
+            key={`link-${match.index}`}
             href={linkMatch[2]}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-green-600 hover:text-green-700 underline decoration-green-400/50 underline-offset-2 font-medium transition-colors"
+            className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-medium transition-colors hover:decoration-green-600"
           >
             {linkMatch[1]}
+            <svg className="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
           </a>
         );
       }
+      // Check if it's bold
+      else if (matchedText.startsWith('**') && matchedText.endsWith('**')) {
+        elements.push(
+          <strong key={`bold-${match.index}`} className="font-semibold">
+            {matchedText.slice(2, -2)}
+          </strong>
+        );
+      }
       
-      return part;
-    });
+      lastIndex = match.index + matchedText.length;
+    }
+    
+    // Add remaining text
+    if (lastIndex < text.length) {
+      elements.push(text.slice(lastIndex));
+    }
+    
+    return elements.length > 0 ? elements : text;
   };
   
   // Alias for backward compatibility
