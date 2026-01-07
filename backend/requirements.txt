@@ -1,0 +1,24 @@
+# FastAPI Backend Requirements
+# Version: 1.0
+# Created: 2025-11-20
+
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Database
+psycopg2-binary==2.9.9
+
+# CORS & Security
+python-multipart==0.0.6
+
+# Environment
+python-dotenv==1.0.0
+
+# Already installed (from main requirements.txt)
+# openai>=1.3.0
+# anthropic>=0.7.0
+# langchain>=0.1.0
+# langgraph>=0.0.20

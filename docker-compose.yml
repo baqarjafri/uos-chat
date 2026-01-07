@@ -11,11 +11,12 @@ services:
     environment:
       # Database credentials (change password in production)
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: stirling_dev_2024
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: stirling_chat
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
-      # Map container port 5432 to host port 5432
-      - "5432:5432"
+      # Map container port 5432 to host port 5433 (avoiding conflict with local PostgreSQL)
+      - "5433:5432"
     volumes:
       # Persist database data
       - postgres_data:/var/lib/postgresql/data

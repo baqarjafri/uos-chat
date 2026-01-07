@@ -22,6 +22,8 @@ langchain>=0.1.0              # LangChain framework
 langchain-openai>=0.1.0       # LangChain OpenAI integration
 langchain-anthropic>=0.1.0    # LangChain Anthropic integration
 langchain-community>=0.0.20   # LangChain community integrations
+langgraph>=0.0.40             # LangGraph for state machines
+langsmith>=0.0.87             # LangSmith for tracing (optional)
 
 # ============================================
 # WEB FRAMEWORK
@@ -30,6 +32,8 @@ fastapi>=0.109.0              # Modern web framework
 uvicorn[standard]>=0.27.0     # ASGI server
 pydantic>=2.5.0               # Data validation
 pydantic-settings>=2.1.0      # Settings management
+python-multipart>=0.0.6       # Form data parsing
+websockets>=12.0              # WebSocket support for real-time chat
 
 # ============================================
 # UTILITIES
@@ -53,6 +57,13 @@ pytest>=7.4.0                 # Testing framework
 black>=23.12.0                # Code formatter
 flake8>=7.0.0                 # Linting
 ipython>=8.19.0               # Enhanced Python shell
+
+# ============================================
+# EMAIL & NOTIFICATIONS
+# ============================================
+aiosmtplib>=3.0.0             # Async SMTP client
+email-validator>=2.1.0        # Email validation
+jinja2>=3.1.0                 # Email templating
 
 # ============================================
 # LOGGING & MONITORING
