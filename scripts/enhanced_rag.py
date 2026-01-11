@@ -68,8 +68,13 @@ class RAGConfig:
     TOP_K_KEYWORD = 5
     TOP_K_FINAL = 3    # Final results after re-ranking
     
+    # Source filtering
+    MAX_SOURCES = 2    # Maximum sources to show in response
+    MIN_SOURCE_SCORE = 0.50  # Minimum score for a source to be included
+    
     # Similarity threshold
-    SIMILARITY_THRESHOLD = 0.40  # 40% minimum similarity
+    SIMILARITY_THRESHOLD = 0.30  # 30% minimum similarity (lowered to retrieve more candidates)
+    LOW_QUALITY_THRESHOLD = 0.45  # If avg score below this, ask clarifying questions
     
     # Re-ranking weights
     WEIGHT_VECTOR_SIMILARITY = 0.5
@@ -213,14 +218,18 @@ class HybridSearch:
         
         return filtered_results
     
-    def _vector_search(self, query: str) -> List[SearchResult]:
-        """Perform vector similarity search"""
-        # Generate embedding
+    def _get_embedding(self, query: str) -> List[float]:
+        """Generate embedding for query"""
         embedding_response = self.openai_client.embeddings.create(
             model="text-embedding-3-small",
             input=query
         )
-        query_embedding = embedding_response.data[0].embedding
+        return embedding_response.data[0].embedding
+    
+    def _vector_search(self, query: str) -> List[SearchResult]:
+        """Perform vector similarity search"""
+        # Get embedding for query
+        query_embedding = self._get_embedding(query)
         
         cursor = self.conn.cursor(cursor_factory=RealDictCursor)
         
@@ -419,7 +428,8 @@ class AnswerGenerator:
         search_results: List[SearchResult],
         student_type: Optional[str] = None,
         student_level: Optional[str] = None,
-        conversation_history: List[Dict] = None
+        conversation_history: List[Dict] = None,
+        detected_programs: List[str] = None
     ) -> RAGResponse:
         """
         Generate answer using Claude
@@ -434,13 +444,27 @@ class AnswerGenerator:
         Returns:
             RAGResponse with answer and metadata
         """
+        detected_programs = detected_programs or []
+        
         # Check if we have good results
         if not search_results:
-            return self._generate_no_results_response(query, conversation_history)
+            return self._generate_no_results_response(query, conversation_history, student_type, student_level, detected_programs)
         
         # Calculate search quality
         avg_score = sum(r.final_score for r in search_results) / len(search_results)
         search_quality_score = avg_score
+        
+        # Check if we have conversation context that can help with low-quality results
+        has_useful_context = (
+            bool(detected_programs) or 
+            (student_type and student_type != 'unknown') or
+            (student_level and student_level != 'unknown')
+        )
+        
+        # If search quality is low AND we have no context, ask clarifying questions
+        # But if we have context, let the LLM use it intelligently
+        if avg_score < RAGConfig.LOW_QUALITY_THRESHOLD and not has_useful_context:
+            return self._generate_clarification_response(query, search_results, conversation_history, student_type, student_level, detected_programs)
         
         # Build context from search results
         context = self._build_context(search_results)
@@ -448,15 +472,18 @@ class AnswerGenerator:
         # Build system prompt with personality and guardrails
         system_prompt = self._build_system_prompt(student_type, student_level)
         
-        # Build user prompt
-        user_prompt = self._build_user_prompt(query, context, conversation_history)
+        # Build user prompt with conversation state for context-aware responses
+        user_prompt = self._build_user_prompt(
+            query, context, conversation_history,
+            student_type, student_level, detected_programs
+        )
         
-        # Generate answer with Claude 4 Sonnet (best quality/cost balance)
-        # Increased to 500 tokens to prevent mid-sentence truncation
-        # System prompt instructs model to keep responses concise
+        # Generate answer with Claude Sonnet 4 (reliable, working model)
+        # Good instruction following and consistent output
+        # Response time ~8-12 seconds
         response = self.client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=500,
+            max_tokens=1000,
             temperature=0.7,  # Natural conversational tone (default is 1.0)
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}]
@@ -465,33 +492,35 @@ class AnswerGenerator:
         answer = response.content[0].text
         
         # Extract unique sources with rich metadata (title, url, category)
-        # Deduplicate by URL while preserving order by relevance (final_score)
+        # Only include sources that meet minimum relevance score
+        # Limit to MAX_SOURCES to keep links relevant
         seen_urls = set()
         sources = []
         for r in sorted(search_results, key=lambda x: x.final_score, reverse=True):
-            if r.source_url not in seen_urls:
+            if r.source_url not in seen_urls and r.final_score >= RAGConfig.MIN_SOURCE_SCORE:
                 seen_urls.add(r.source_url)
                 sources.append({
                     "url": r.source_url,
                     "title": r.source_title or self._generate_title_from_url(r.source_url),
-                    "category": r.category or "general"
+                    "category": r.category or "general",
+                    "relevance_score": round(r.final_score, 3)
                 })
+                # Limit to configured max sources
+                if len(sources) >= RAGConfig.MAX_SOURCES:
+                    break
         
         # Clean up answer - remove any source sections the AI might have added
         import re
-        # Remove common source section patterns
+        # Remove specific source sections - more precise patterns
         patterns = [
-            r'\n\n.*?\*\*Sources:\*\*.*?$',  # **Sources:** section
-            r'\n\n.*?Sources:.*?$',  # Sources: section
-            r'\n\n.*?Useful links:.*?$',  # Useful links: section
-            r'\n\n.*?Learn more:.*?$',  # Learn more: section
-            r'\n\n.*?📚.*?Sources.*?$',  # Emoji sources
-            r'\n\n.*?🔗.*?http.*?$',  # Link emojis with URLs
-            r'\n\n.*?•.*?https://www\.stir\.ac\.uk.*?$',  # Bullet points with URLs
+            r'\n\*\*Sources:\*\*.*$',  # **Sources:** section (more precise)
+            r'\nSources:.*$',  # Sources: section (more precise)
+            r'\nUseful links:.*$',  # Useful links: section (more precise)
+            r'\nLearn more:.*$',  # Learn more: section (more precise)
         ]
         
         for pattern in patterns:
-            answer = re.sub(pattern, '', answer, flags=re.MULTILINE | re.DOTALL)
+            answer = re.sub(pattern, '', answer, flags=re.MULTILINE)
         
         # Remove any remaining URLs at the end
         answer = re.sub(r'\n\nhttps://.*?$', '', answer, flags=re.MULTILINE)
@@ -535,75 +564,172 @@ class AnswerGenerator:
 
 TODAY'S DATE: {current_date.strftime("%d %B %Y")} (Current month: {current_month}, Current year: {current_year})
 
-DATE-AWARENESS (Critical for Intakes & Deadlines):
-- When user asks about "September intake" or "January intake" WITHOUT specifying a year:
-  • If we're BEFORE that month in the current year → assume they mean THIS year ({current_year})
-  • If we're PAST that month in the current year → assume they mean NEXT year ({current_year + 1})
-  • Example: If today is January 2026 and user asks about "September intake" → answer for September 2026
-  • Example: If today is October 2026 and user asks about "September intake" → answer for September 2027
-- When context contains data from past years (e.g., 2024, 2025), adapt it to the relevant upcoming intake
-- For deadlines: If a deadline has already passed, mention the next available intake instead
-- Always clarify the year in your response: "For September 2026 intake..." not just "For September intake..."
+═══════════════════════════════════════════════════════════════
+DECISION LOGIC - FOLLOW THIS EXACT ORDER (CRITICAL)
+═══════════════════════════════════════════════════════════════
 
-RESPONSE STYLE (Critical):
-- Be CONCISE: 50-100 words max for simple questions, 150 max for complex ones
-- Sound HUMAN: Write like you're texting a friend, not writing an essay
-- NEVER repeat or rephrase the user's question back to them
-- Jump straight to the answer - no preambles like "Great question!" or "I'd be happy to help!"
-- Use contractions (it's, you'll, don't) to sound natural
+STEP 1: Does the context contain information that DIRECTLY answers the user's question?
+  → YES: Answer using that information. Be specific and helpful.
+  → NO: Go to Step 2.
 
-CORE RULES:
+STEP 2: Does the context contain RELATED but not exact information?
+  → YES: Share what you DO have, then ask ONE clarifying question to get closer.
+         Example: "I have info on MSc programs in this area. Are you looking at undergraduate or postgraduate?"
+  → NO: Go to Step 3.
+
+STEP 3: Is the user asking about a topic where you need more details to help?
+  → YES: Ask ONE specific clarifying question (program name, UK/international, undergrad/postgrad)
+  → NO: Offer to connect with admissions team.
+
+GOLDEN RULE: If context has ANY relevant information, USE IT. Never say "I don't have information" when the context contains related content. Extract value from what you have.
+
+═══════════════════════════════════════════════════════════════
+TOPIC SWITCHING - CRITICAL
+═══════════════════════════════════════════════════════════════
+
+When user switches to a NEW topic (e.g., from AI to Economics):
+- IGNORE previous conversation topics completely
+- Focus ONLY on the new topic they're asking about
+- The context provided is already filtered for their NEW question
+- Never say "I see you're now interested in X instead of Y" - just answer about X
+- Never reference what you discussed before unless user explicitly asks
+
+BAD: "I can see you're interested in Economics now. Unfortunately, I don't have specific information about PhD programs in Economics - the context I have covers AI programs."
+GOOD: "For PhD Economics at Stirling, you'll need [answer from context]..."
+
+═══════════════════════════════════════════════════════════════
+CORE RULES
+═══════════════════════════════════════════════════════════════
+
 1. Answer using ONLY the provided context - be factual
-2. URL HANDLING:
-   - By default, DON'T include URLs in your response (system shows them in "Related Pages" section)
-   - EXCEPTION: If user explicitly asks for "link", "page", "URL", "website", or "where can I find":
-     • Include up to 2 most relevant links INLINE using markdown format: [Page Title](url)
-     • Example: "Here's the [MSc AI course page](https://www.stir.ac.uk/courses/pg/artificial-intelligence/) with all the details."
-     • Make the link text descriptive and natural, not just "click here"
+2. Stay focused on University of Stirling topics
 3. NEVER assume or guess:
    - Student's background or nationality
    - Whether they're undergraduate or postgraduate
    - Their student type (UK, international, Scottish)
    - Any personal details not explicitly stated
    Always ASK if you don't know - don't make educated guesses!
-4. Stay focused on University of Stirling topics
 
-WHEN YOU NEED MORE INFO:
+═══════════════════════════════════════════════════════════════
+RESPONSE STYLE
+═══════════════════════════════════════════════════════════════
+
+- Be CONCISE: 50-100 words for simple questions, 150 max for complex
+- Sound HUMAN: Write like texting a friend, use contractions (it's, you'll, don't)
+- Jump straight to the answer - no preambles like "Great question!" or "I'd be happy to help!"
+- NEVER repeat the user's question back to them
+- ALWAYS FRAME POSITIVELY:
+  • Lead with what you CAN help with
+  • Never start with "Unfortunately", "I'm sorry but", "I don't have"
+  • Instead of "I don't have X" → "Here's what I can tell you about [topic]..."
+
+═══════════════════════════════════════════════════════════════
+DATE-AWARENESS (Intakes & Deadlines)
+═══════════════════════════════════════════════════════════════
+
+- "September intake" without year: If before September → this year ({current_year}), if after → next year ({current_year + 1})
+- "January intake" without year: If before January → this year ({current_year}), if after → next year ({current_year + 1})
+- Adapt past year data (2024, 2025) to upcoming intakes
+- For deadlines: If already passed, mention the next available intake
+- Always clarify year: "For September {current_year} intake..." not just "For September intake..."
+
+═══════════════════════════════════════════════════════════════
+APPLICATION LINKS (Use these EXACT URLs - ignore any others from context)
+═══════════════════════════════════════════════════════════════
+
+- Postgraduate Taught (Masters): https://portal.stir.ac.uk/student/course-application/pg/application.jsp
+- Postgraduate Research (PhD/MPhil): https://portal.stir.ac.uk/student/course-application/pgr/application.jsp
+- Undergraduate: https://portal.stir.ac.uk/student/course-application/ugd/application.jsp
+
+When user wants to apply or asks for application link:
+- PhD/MPhil/Doctoral/Research degree → use Postgraduate Research link
+- Masters/MSc/MA/MBA/MLitt/postgraduate taught → use Postgraduate Taught link
+- Undergraduate/bachelors/BA/BSc → use Undergraduate link
+- If unclear, ASK: "Are you applying for undergraduate, a taught Masters, or a research degree (PhD/MPhil)?"
+
+═══════════════════════════════════════════════════════════════
+URL FORMATTING (CRITICAL)
+═══════════════════════════════════════════════════════════════
+
+- Use SINGLE bracket markdown: [Link Text](url)
+- CORRECT: [MSc Artificial Intelligence](https://www.stir.ac.uk/courses/pg/artificial-intelligence/)
+- CORRECT: [BSc Biology](https://www.stir.ac.uk/courses/ug/biology)
+- WRONG: [[MSc AI](url) ← NO double brackets!
+- WRONG: MSc AI](url) ← Missing opening [
+- WRONG: [MSc AI - description ← NO standalone [ without closing ]
+- NEVER use double brackets [[ - always single [
+- NEVER start a line with [ unless it's a complete markdown link [text](url)
+- NEVER use [ for bullet points or list items - use • or - instead
+- Include up to 2 relevant links per response
+- Make link text the program name or page title, not "click here"
+- Use URLs from context's source URLs for program pages
+
+═══════════════════════════════════════════════════════════════
+FEES
+═══════════════════════════════════════════════════════════════
+
+- Quote EXACT figures with £ symbol from context
+- If not in context: "For the most accurate fee information, our admissions team can help: admissions@stir.ac.uk"
+
+═══════════════════════════════════════════════════════════════
+FORMATTING
+═══════════════════════════════════════════════════════════════
+
+- **Bold** for key info (fees, deadlines)
+- Short bullet points (3-4 max)
+- No long numbered lists unless truly needed
+- One follow-up question at end if relevant
+
+═══════════════════════════════════════════════════════════════
+CLARIFYING QUESTIONS (When you need more info)
+═══════════════════════════════════════════════════════════════
+
 Ask ONE short question:
 - "Which program are you interested in?" or "What course are you looking at?"
 - "Are you a UK or international student?"
 - "Undergrad or postgrad?"
 
-FEES:
-- Quote EXACT figures from context with £ symbol
-- If fee not in context: "I don't have that exact fee - our admissions team can help: admissions@stir.ac.uk"
+═══════════════════════════════════════════════════════════════
+ESCALATION (Use sparingly - only after trying to help first)
+═══════════════════════════════════════════════════════════════
 
-FORMATTING:
-- Use **bold** sparingly for key info (fees, deadlines)
-- Short bullet points for lists (3-4 max)
-- No long numbered lists unless truly needed
-- One short follow-up question at the end if relevant
-
-FAREWELLS:
-When user says bye/thanks/cheers:
-"Good luck with your application! Reach out anytime - admissions@stir.ac.uk or +44 1786 467044. Take care!"
-
-ESCALATION (Use sparingly - only after trying to help first):
 1. FIRST: Try to answer with available context
-2. IF VAGUE: Ask ONE clarifying question (which program? UK or international? undergrad or postgrad?)
-3. AFTER providing useful info: Ask if they need more details or want to speak with admissions
+2. IF VAGUE: Ask ONE clarifying question
+3. AFTER providing useful info: Ask if they need more details
 4. ONLY escalate when you genuinely can't help after 2-3 exchanges:
-   "I don't have that specific info. Want me to connect you with our admissions team? Just share your name and email."
+   "Want me to connect you with our admissions team? Just share your name and email."
 
 NEVER escalate on the first message - always try to help or ask clarifying questions first!
 
-BAD EXAMPLES (Don't do this):
-❌ "You asked about the fees for MSc AI. The fees for the MSc Artificial Intelligence program are..."
-❌ "Great question! I'd be happy to help you with information about..."
+═══════════════════════════════════════════════════════════════
+CONTACT DETAILS FORMATTING
+═══════════════════════════════════════════════════════════════
+
+When mentioning contact details, always use these exact formats (UI will auto-link them):
+- Email: admissions@stir.ac.uk (plain text, no markdown)
+- Phone: +44 1786 467044 (with +44 prefix and spaces)
+- Never wrap emails or phone numbers in markdown links - just write them as plain text
+
+═══════════════════════════════════════════════════════════════
+FAREWELLS
+═══════════════════════════════════════════════════════════════
+
+When user says bye/thanks/cheers:
+"Good luck with your application! Reach out anytime - admissions@stir.ac.uk or +44 1786 467044. Take care!"
+
+═══════════════════════════════════════════════════════════════
+EXAMPLES
+═══════════════════════════════════════════════════════════════
+
+BAD:
+❌ "I can see you're interested in Economics now. Unfortunately, I don't have specific information..."
+❌ "You asked about the fees for MSc AI. The fees are..."
+❌ "Great question! I'd be happy to help..."
 ❌ "Based on the information provided, I can tell you that..."
 
-GOOD EXAMPLES (Do this):
+GOOD:
 ✓ "MSc AI fees are £24,300/year for international students, £10,500 for UK."
+✓ "PhD Economics at Stirling focuses on [info from context]. Entry requirements include..."
 ✓ "The deadline is January 15th. Need help with your application?"
 ✓ "Entry requirements: 2:1 degree in a related field + IELTS 6.0. Which part would you like more detail on?\""""
         
@@ -622,16 +748,38 @@ GOOD EXAMPLES (Do this):
         self,
         query: str,
         context: str,
-        conversation_history: List[Dict] = None
+        conversation_history: List[Dict] = None,
+        student_type: Optional[str] = None,
+        student_level: Optional[str] = None,
+        detected_programs: List[str] = None
     ) -> str:
-        """Build user prompt with query and context"""
+        """Build user prompt with query, context, and conversation state"""
         
         prompt_parts = []
+        detected_programs = detected_programs or []
+        
+        # Add what we already know about this user (CRITICAL for context-aware responses)
+        known_facts = []
+        if detected_programs:
+            known_facts.append(f"Program interest: {', '.join(detected_programs)}")
+        if student_type and student_type != 'unknown':
+            known_facts.append(f"Student type: {student_type}")
+        if student_level and student_level != 'unknown':
+            known_facts.append(f"Study level: {student_level}")
+        
+        if known_facts:
+            prompt_parts.append("=== WHAT WE KNOW ABOUT THIS USER (USE THIS!) ===")
+            for fact in known_facts:
+                prompt_parts.append(f"• {fact}")
+            prompt_parts.append("")
+            prompt_parts.append("IMPORTANT: Use this information when answering. Do NOT ask for info we already have.")
+            prompt_parts.append("If user says something vague like 'I am international student', combine it with known program interest.")
+            prompt_parts.append("=== END USER PROFILE ===")
+            prompt_parts.append("")
         
         # Add conversation history if available (last 6 messages for better context)
         if conversation_history and len(conversation_history) > 0:
-            prompt_parts.append("=== CONVERSATION HISTORY ===")
-            prompt_parts.append("(Use this to understand context and maintain conversation flow)")
+            prompt_parts.append("=== CONVERSATION HISTORY (Reference Only) ===")
             prompt_parts.append("")
             # Include last 6 messages (3 exchanges) for full context
             for msg in conversation_history[-6:]:
@@ -653,7 +801,19 @@ GOOD EXAMPLES (Do this):
         prompt_parts.append("=== CURRENT QUESTION ===")
         prompt_parts.append(f"{query}")
         prompt_parts.append("")
-        prompt_parts.append("Answer the question using the context above. Maintain conversation flow if there's history.")
+        
+        # Build smart instructions based on what we know
+        if known_facts:
+            prompt_parts.append("""INSTRUCTIONS:
+1. The user profile above shows what we already know - USE IT
+2. Combine the current question with known context (e.g., if we know they're interested in MSc AI and they say "I'm international", answer about MSc AI for international students)
+3. Only ask for info that's MISSING from the user profile
+4. If context doesn't have specific info for their situation, say what you DO have and ask ONE clarifying question""")
+        else:
+            prompt_parts.append("""INSTRUCTIONS:
+1. Answer using the context above
+2. If the question is vague and you need more info, ask ONE specific clarifying question
+3. Focus on being helpful - share what you CAN tell them""")
         
         return "\n".join(prompt_parts)
     
@@ -694,67 +854,83 @@ GOOD EXAMPLES (Do this):
         
         return ' - '.join(title_parts) if title_parts else "University of Stirling"
     
-    def _generate_no_results_response(self, query: str, conversation_history: List[Dict] = None) -> RAGResponse:
-        """Generate response when no good results found - ask clarifying questions first"""
+    def _generate_no_results_response(
+        self,
+        query: str,
+        conversation_history: List[Dict] = None,
+        student_type: Optional[str] = None,
+        student_level: Optional[str] = None,
+        detected_programs: List[str] = None
+    ) -> RAGResponse:
+        """Generate smart response when no results found - uses conversation context"""
         
-        # Count conversation turns to determine if we should escalate or ask questions
+        detected_programs = detected_programs or []
+        
+        # Build acknowledgment of what we already know
+        known_parts = []
+        missing_parts = []
+        
+        if detected_programs:
+            known_parts.append(f"interested in **{detected_programs[-1]}**")
+        else:
+            missing_parts.append("which **program or subject area** interests you")
+        
+        if student_type and student_type != 'unknown':
+            known_parts.append(f"**{student_type}** student")
+        else:
+            missing_parts.append("**UK or international** student")
+        
+        if student_level and student_level != 'unknown':
+            known_parts.append(f"**{student_level}** level")
+        else:
+            missing_parts.append("**undergraduate or postgraduate**")
+        
+        # Count conversation turns
         turn_count = len(conversation_history) // 2 if conversation_history else 0
         
-        # For first few messages (turns 0-2), ask clarifying questions instead of escalating
-        if turn_count < 3:
-            # Detect what type of clarification is needed based on query
+        # Build context-aware response
+        if known_parts and missing_parts:
+            # We know some things, ask only for what's missing
+            known_str = ", ".join(known_parts)
+            answer = f"I see you're {known_str}. To help you better, could you tell me {missing_parts[0]}?"
+        elif known_parts and not missing_parts:
+            # We know everything but still no results - offer escalation
+            known_str = ", ".join(known_parts)
+            answer = f"""I see you're {known_str}, but I don't have specific information for this in my knowledge base.
+
+Would you like me to connect you with our admissions team? Just share your name and email, and they'll get back to you within 1-2 business days."""
+        elif turn_count < 3:
+            # Early in conversation, no context - ask clarifying questions
             query_lower = query.lower()
             
             if any(word in query_lower for word in ['apply', 'application', 'how to']):
-                answer = """To help you with the application process, I need a bit more info:
+                answer = """To help with applications, I need a bit more info:
 
-- **Which program** are you interested in? (e.g., MSc Data Science, BA Business)
-- Are you looking at **undergraduate or postgraduate** study?
-
-Once I know this, I can give you specific application steps and deadlines!"""
+- **Which program** are you interested in?
+- Are you looking at **undergraduate or postgraduate** study?"""
             
             elif any(word in query_lower for word in ['fee', 'cost', 'tuition', 'price']):
-                answer = """Fees vary by program and student type. To give you accurate info:
+                answer = """Fees vary by program and student type. Could you tell me:
 
 - **Which course** are you interested in?
-- Are you a **UK or international** student?
-
-Let me know and I'll get you the exact figures!"""
+- Are you a **UK or international** student?"""
             
             elif any(word in query_lower for word in ['requirement', 'entry', 'qualification']):
-                answer = """Entry requirements depend on the specific program. Could you tell me:
+                answer = """Entry requirements depend on the program. Could you tell me:
 
 - **Which course** are you considering?
-- **Undergrad or postgrad**?
-
-I'll then give you the exact requirements!"""
+- **Undergrad or postgrad**?"""
             
             else:
-                answer = """I'd love to help! Could you tell me a bit more about what you're looking for?
+                answer = """I'd love to help! Could you tell me:
 
-For example:
 - Which **program or subject area** interests you?
-- Are you looking at **undergraduate or postgraduate** study?
+- Are you looking at **undergraduate or postgraduate** study?"""
+        else:
+            # Late in conversation, no context - offer escalation
+            answer = """I don't have that specific information. Would you like me to connect you with our admissions team?
 
-This will help me give you the most relevant information!"""
-            
-            return RAGResponse(
-                answer=answer,
-                sources=[],
-                search_results=[],
-                search_quality_score=0.0,
-                needs_clarification=True,
-                clarification_context="vague_query"
-            )
-        
-        # After 3+ turns of conversation, if still no results, offer escalation
-        answer = """I don't have that specific information in my knowledge base. I'd be happy to connect you with our admissions team who can provide a detailed response.
-
-Could you please share:
-- Your full name
-- Your email address
-
-Our team will review your query and get back to you within 1-2 business days."""
+Just share your name and email, and they'll get back to you within 1-2 business days."""
         
         return RAGResponse(
             answer=answer,
@@ -762,8 +938,214 @@ Our team will review your query and get back to you within 1-2 business days."""
             search_results=[],
             search_quality_score=0.0,
             needs_clarification=True,
-            clarification_context=query
+            clarification_context="no_results"
         )
+    
+    def _generate_clarification_response(
+        self,
+        query: str,
+        search_results: List[SearchResult],
+        conversation_history: List[Dict] = None,
+        student_type: Optional[str] = None,
+        student_level: Optional[str] = None,
+        detected_programs: List[str] = None
+    ) -> RAGResponse:
+        """
+        Generate SMART clarifying questions when search results are low quality.
+        Acknowledges what we already know and only asks for missing info.
+        """
+        detected_programs = detected_programs or []
+        query_lower = query.lower()
+        
+        # Build what we know vs what's missing
+        known_parts = []
+        missing_parts = []
+        
+        if detected_programs:
+            known_parts.append(f"interested in **{detected_programs[-1]}**")
+        else:
+            missing_parts.append("program")
+        
+        if student_type and student_type != 'unknown':
+            known_parts.append(f"**{student_type}** student")
+        else:
+            missing_parts.append("student_type")
+        
+        if student_level and student_level != 'unknown':
+            known_parts.append(f"**{student_level}** level")
+        else:
+            missing_parts.append("level")
+        
+        # If we have context, build a smart response acknowledging what we know
+        if known_parts:
+            known_str = ", ".join(known_parts)
+            
+            # Determine what single piece of info would help most
+            if "program" in missing_parts:
+                question = "Which **program or subject area** are you interested in?"
+            elif "level" in missing_parts:
+                question = "Are you looking at **undergraduate or postgraduate** study?"
+            elif "student_type" in missing_parts:
+                question = "Are you a **UK or international** student?"
+            else:
+                question = "What specific aspect would you like to know about? (fees, requirements, deadlines, etc.)"
+            
+            answer = f"I see you're {known_str}. {question}"
+        else:
+            # No context - use query-based clarification (existing logic)
+            if any(word in query_lower for word in ['fee', 'cost', 'tuition', 'price', 'how much']):
+                answer = """Fees vary by program and student type. Could you tell me:
+
+- **Which program** are you interested in?
+- Are you a **UK or international** student?"""
+            
+            elif any(word in query_lower for word in ['requirement', 'entry', 'qualification', 'need', 'eligible']):
+                answer = """Entry requirements vary by program. Could you tell me:
+
+- **Which course** are you considering?
+- **Undergrad or postgrad**?"""
+            
+            elif any(word in query_lower for word in ['apply', 'application', 'deadline', 'how to']):
+                answer = """To help with applications, could you tell me:
+
+- **Which program** are you applying for?
+- **Undergraduate, Masters, or PhD**?"""
+            
+            elif any(word in query_lower for word in ['scholarship', 'funding', 'bursary', 'financial']):
+                answer = """To find the best scholarships for you:
+
+- Are you a **UK or international** student?
+- Which **program** are you interested in?"""
+            
+            else:
+                answer = """I'd love to help! Could you tell me:
+
+- Which **program or subject area** interests you?
+- Are you looking at **undergraduate or postgraduate** study?"""
+        
+        return RAGResponse(
+            answer=answer,
+            sources=[],
+            search_results=search_results,
+            search_quality_score=sum(r.final_score for r in search_results) / len(search_results) if search_results else 0,
+            needs_clarification=True,
+            clarification_context="low_quality_results"
+        )
+
+
+# ============================================
+# FOLLOW-UP QUESTION GENERATOR
+# ============================================
+
+def generate_follow_up_questions(
+    query: str,
+    answer: str,
+    detected_programs: List[str] = None,
+    student_type: str = None,
+    student_level: str = None
+) -> List[Dict]:
+    """
+    Generate 2 context-aware follow-up questions based on conversation topic.
+    Returns list of dicts with 'text' and 'icon' keys.
+    """
+    query_lower = query.lower()
+    answer_lower = answer.lower()
+    
+    # Comprehensive question bank organized by topic
+    question_bank = {
+        'fees': [
+            {"text": "What scholarships can help reduce my tuition fees?", "icon": "award"},
+            {"text": "Can I pay my tuition fees in monthly installments?", "icon": "credit-card"},
+            {"text": "Are there any additional costs I should budget for?", "icon": "receipt"},
+        ],
+        'courses': [
+            {"text": "What are the entry requirements for this program?", "icon": "clipboard"},
+            {"text": "What career opportunities does this degree lead to?", "icon": "briefcase"},
+            {"text": "Is there a part-time study option available?", "icon": "clock"},
+        ],
+        'requirements': [
+            {"text": "What IELTS or English language score do I need?", "icon": "globe"},
+            {"text": "Do you consider work experience in place of qualifications?", "icon": "briefcase"},
+            {"text": "How do I submit my application and documents?", "icon": "send"},
+        ],
+        'scholarships': [
+            {"text": "When is the deadline to apply for scholarships?", "icon": "calendar"},
+            {"text": "Can I combine multiple scholarships together?", "icon": "layers"},
+            {"text": "What documents do I need for the scholarship application?", "icon": "file"},
+        ],
+        'application': [
+            {"text": "What documents do I need to complete my application?", "icon": "file"},
+            {"text": "How long does the application decision take?", "icon": "clock"},
+            {"text": "Can I defer my offer to the next intake?", "icon": "calendar"},
+        ],
+        'accommodation': [
+            {"text": "How much does on-campus accommodation cost per month?", "icon": "home"},
+            {"text": "Is accommodation guaranteed for international students?", "icon": "shield"},
+            {"text": "What amenities are included in the accommodation?", "icon": "list"},
+        ],
+        'visa': [
+            {"text": "What is the process to apply for a UK student visa?", "icon": "passport"},
+            {"text": "Can I work part-time while studying on a student visa?", "icon": "briefcase"},
+            {"text": "When should I start my visa application process?", "icon": "calendar"},
+        ],
+        'intake': [
+            {"text": "What is the application deadline for this intake?", "icon": "calendar"},
+            {"text": "What are the tuition fees for international students?", "icon": "pound"},
+            {"text": "How do I apply for this intake?", "icon": "send"},
+        ],
+        'campus': [
+            {"text": "What sports and recreational facilities are available?", "icon": "activity"},
+            {"text": "How do I get from the campus to Stirling city centre?", "icon": "map"},
+            {"text": "What student support services are available?", "icon": "heart"},
+        ],
+        'default': [
+            {"text": "What are the tuition fees for this program?", "icon": "pound"},
+            {"text": "When is the next application deadline?", "icon": "calendar"},
+            {"text": "What scholarships are available for students?", "icon": "award"},
+        ]
+    }
+    
+    # Detect primary topic from query
+    topic = 'default'
+    topic_keywords = {
+        'fees': ['fee', 'cost', 'tuition', 'price', 'pay', 'expensive', 'afford'],
+        'courses': ['course', 'program', 'degree', 'msc', 'bsc', 'study', 'module', 'curriculum'],
+        'requirements': ['requirement', 'qualify', 'eligible', 'need', 'ielts', 'gpa', 'grade'],
+        'scholarships': ['scholarship', 'bursary', 'funding', 'financial aid', 'discount'],
+        'application': ['apply', 'application', 'submit', 'deadline', 'ucas', 'offer'],
+        'accommodation': ['accommodation', 'housing', 'residence', 'dorm', 'room', 'flat'],
+        'visa': ['visa', 'immigration', 'cas', 'tier 4', 'sponsor'],
+        'intake': ['intake', 'semester', 'start date', 'january', 'september', 'when can i start'],
+        'campus': ['campus', 'facility', 'library', 'gym', 'sport', 'location', 'city'],
+    }
+    
+    for topic_name, keywords in topic_keywords.items():
+        if any(kw in query_lower for kw in keywords):
+            topic = topic_name
+            break
+    
+    # Secondary topic detection from answer if query didn't match
+    if topic == 'default':
+        for topic_name, keywords in topic_keywords.items():
+            if any(kw in answer_lower for kw in keywords):
+                topic = topic_name
+                break
+    
+    # Get questions for detected topic
+    questions = question_bank.get(topic, question_bank['default']).copy()
+    
+    # Personalize with detected program name if available
+    if detected_programs and len(detected_programs) > 0:
+        program = detected_programs[0]
+        questions = [
+            {
+                "text": q["text"].replace("this program", program).replace("this degree", program),
+                "icon": q["icon"]
+            }
+            for q in questions
+        ]
+    
+    return questions[:2]  # Limit to 2 questions for cleaner UI
 
 
 # ============================================
@@ -833,13 +1215,14 @@ class EnhancedRAG:
             detected_programs=detected_programs
         )
         
-        # 3. Generate answer
+        # 3. Generate answer with full conversation context
         response = self.answer_generator.generate(
             query=query,
             search_results=reranked_results,
             student_type=student_type,
             student_level=student_level,
-            conversation_history=conversation_history
+            conversation_history=conversation_history,
+            detected_programs=detected_programs
         )
         
         return response

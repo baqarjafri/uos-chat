@@ -85,6 +85,7 @@ export default function ChatWidget() {
         role: 'assistant',
         content: data.answer,
         sources: data.sources || [],
+        suggested_questions: data.suggested_questions || [],
         timestamp: new Date()
       }])
       
@@ -118,33 +119,113 @@ export default function ChatWidget() {
   }
 
   // Helper function to render formatted text (bold and links)
+  // Unified function to normalize all malformed text patterns from LLM
+  const normalizeMalformedText = (text) => {
+    if (!text) return text;
+    
+    let processedText = text;
+    
+    // Fix 1: Multiple opening brackets [[[text](url) or [[text](url) -> [text](url)
+    processedText = processedText.replace(/\[\[+/g, '[');
+    
+    // Fix 2: Comprehensive orphaned bracket removal
+    // Catches ALL cases where [ appears before a proper markdown link
+    // Pattern: "[text [Link](url)" or "[ [Link](url)" -> "[Link](url)"
+    processedText = processedText.replace(/\[([^\[\]]*?)\s*(\[[^\]]+\]\(https?:\/\/[^\s\)]+\))/g, (match, beforeLink, link) => {
+      const cleanBefore = beforeLink.trim();
+      return cleanBefore ? (cleanBefore + ' ' + link) : link;
+    });
+    
+    // Fix 3: Remove standalone [ immediately followed by proper link
+    // Pattern: "[[Link](url)" -> "[Link](url)"
+    processedText = processedText.replace(/\[(?=\[[^\]]+\]\(https?:\/\/[^\s\)]+\))/g, '');
+    
+    // Fix 4: Missing opening bracket - Text](url) -> [Text](url)
+    processedText = processedText.replace(/([A-Za-z0-9\s\(\)\-\'\"]+)\]\((https?:\/\/[^\s\)]+)\)/g, (match, linkText, url) => {
+      const trimmedText = linkText.trim();
+      if (trimmedText && !match.startsWith('[')) {
+        return `[${trimmedText}](${url})`;
+      }
+      return match;
+    });
+    
+    // Fix 5: Remove any remaining standalone [ not part of valid link
+    processedText = processedText.replace(/\[(?![^\]]*\]\()(?!\[)/g, '');
+    
+    // Fix 6: Clean up multiple spaces that may result from replacements
+    processedText = processedText.replace(/\s{2,}/g, ' ').trim();
+    
+    return processedText;
+  };
+
   const renderFormattedText = (text) => {
     if (!text) return text;
     
-    // First, handle markdown links [text](url) - convert to clickable links
-    // Use a more robust regex that handles URLs with special characters
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    const boldRegex = /\*\*([^*]+)\*\*/g;
+    // Pre-process: Fix malformed link patterns using unified function
+    let processedText = normalizeMalformedText(text);
     
     // Process the text to find all matches and their positions
     const elements = [];
     let lastIndex = 0;
     let match;
     
-    // Create a combined regex to find both patterns
-    const combinedRegex = /(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g;
+    // Create a combined regex to find patterns: bold, links, emails, and phone numbers
+    // Email: word@word.word format
+    // Phone: +44 followed by digits with optional spaces, or UK format numbers
+    const combinedRegex = /(\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s\)]+\/?[^\s\)]*\)|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|\+44\s?[\d\s]{10,13})/g;
     
-    while ((match = combinedRegex.exec(text)) !== null) {
+    while ((match = combinedRegex.exec(processedText)) !== null) {
       // Add text before the match
       if (match.index > lastIndex) {
-        elements.push(text.slice(lastIndex, match.index));
+        elements.push(processedText.slice(lastIndex, match.index));
       }
       
       const matchedText = match[0];
       
-      // Check if it's a link
-      const linkMatch = matchedText.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+      // Check if it's an email address
+      const emailMatch = matchedText.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+      if (emailMatch) {
+        elements.push(
+          <a 
+            key={`email-${match.index}`}
+            href={`mailto:${matchedText}`}
+            className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-medium transition-colors hover:decoration-green-600"
+          >
+            {matchedText}
+            <svg className="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </a>
+        );
+        lastIndex = match.index + matchedText.length;
+        continue;
+      }
+      
+      // Check if it's a phone number
+      const phoneMatch = matchedText.match(/^\+44\s?[\d\s]{10,13}$/);
+      if (phoneMatch) {
+        const cleanPhone = matchedText.replace(/\s/g, '');
+        elements.push(
+          <a 
+            key={`phone-${match.index}`}
+            href={`tel:${cleanPhone}`}
+            className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-medium transition-colors hover:decoration-green-600"
+          >
+            {matchedText}
+            <svg className="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+          </a>
+        );
+        lastIndex = match.index + matchedText.length;
+        continue;
+      }
+      
+      // Check if it's a link - more permissive regex for URL matching
+      const linkMatch = matchedText.match(/^\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/);
       if (linkMatch) {
+        // Clean link text: remove any leading/trailing brackets from malformed LLM output
+        const cleanLinkText = linkMatch[1].replace(/^\[+/, '').replace(/\]+$/, '');
         elements.push(
           <a 
             key={`link-${match.index}`}
@@ -153,7 +234,7 @@ export default function ChatWidget() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-medium transition-colors hover:decoration-green-600"
           >
-            {linkMatch[1]}
+            {cleanLinkText}
             <svg className="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
@@ -162,19 +243,43 @@ export default function ChatWidget() {
       }
       // Check if it's bold
       else if (matchedText.startsWith('**') && matchedText.endsWith('**')) {
-        elements.push(
-          <strong key={`bold-${match.index}`} className="font-semibold">
-            {matchedText.slice(2, -2)}
-          </strong>
-        );
+        const innerText = matchedText.slice(2, -2);
+        // Check if the bold text contains a link: **[text](url)**
+        const innerLinkMatch = innerText.match(/^\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)$/);
+        if (innerLinkMatch) {
+          // Clean link text: remove any leading/trailing brackets from malformed LLM output
+          const cleanBoldLinkText = innerLinkMatch[1].replace(/^\[+/, '').replace(/\]+$/, '');
+          // It's a bold link - render as bold link
+          elements.push(
+            <a 
+              key={`bold-link-${match.index}`}
+              href={innerLinkMatch[2]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-semibold transition-colors hover:decoration-green-600"
+            >
+              {cleanBoldLinkText}
+              <svg className="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          );
+        } else {
+          // Regular bold text
+          elements.push(
+            <strong key={`bold-${match.index}`} className="font-semibold">
+              {innerText}
+            </strong>
+          );
+        }
       }
       
       lastIndex = match.index + matchedText.length;
     }
     
     // Add remaining text
-    if (lastIndex < text.length) {
-      elements.push(text.slice(lastIndex));
+    if (lastIndex < processedText.length) {
+      elements.push(processedText.slice(lastIndex));
     }
     
     return elements.length > 0 ? elements : text;
@@ -371,7 +476,8 @@ export default function ChatWidget() {
                   {/* Message Content */}
                   <div className={`text-[15px] leading-relaxed break-words ${message.role === 'user' ? 'text-white' : 'text-gray-700'}`}>
                     {message.content.split('\n').map((line, i) => {
-                      const trimmedLine = line.trim();
+                      // Normalize malformed text using unified function
+                      let trimmedLine = normalizeMalformedText(line.trim());
                       
                       if (!trimmedLine) {
                         return <div key={i} className="h-3" />;
@@ -414,7 +520,7 @@ export default function ChatWidget() {
                       // Regular text
                       return (
                         <p key={i} className={i > 0 ? 'mt-2' : ''}>
-                          {renderInlineBold(line)}
+                          {renderInlineBold(trimmedLine)}
                         </p>
                       );
                     })}
@@ -474,6 +580,56 @@ export default function ChatWidget() {
                                 <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-green-500 flex-shrink-0 mt-0.5 transition-colors" />
                               </div>
                             </a>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Quick Reply Buttons - Only show on last assistant message */}
+                  {message.suggested_questions && message.suggested_questions.length > 0 && 
+                   index === messages.length - 1 && message.role === 'assistant' && !isLoading && (
+                    <div className="mt-4 pt-3 border-t border-gray-100">
+                      <p className="text-xs text-gray-400 mb-2.5 font-medium uppercase tracking-wide">Continue exploring</p>
+                      <div className="flex flex-col gap-2">
+                        {message.suggested_questions.map((question, qIdx) => {
+                          // Icon mapping for professional look
+                          const getIcon = (iconName) => {
+                            const icons = {
+                              'award': '🏆', 'credit-card': '💳', 'receipt': '📋',
+                              'clipboard': '📝', 'briefcase': '💼', 'clock': '⏰',
+                              'globe': '🌐', 'send': '📤', 'calendar': '📅',
+                              'layers': '📚', 'file': '📄', 'home': '🏠',
+                              'shield': '🛡️', 'list': '📋', 'passport': '🛂',
+                              'pound': '💷', 'activity': '⚡', 'map': '🗺️', 'heart': '❤️'
+                            };
+                            return icons[iconName] || '💬';
+                          };
+                          
+                          return (
+                            <button
+                              key={qIdx}
+                              onClick={() => {
+                                setInputMessage(question.text);
+                                setTimeout(() => inputRef.current?.focus(), 50);
+                              }}
+                              className="group flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gray-50 via-white to-gray-50 
+                                         border border-gray-200 rounded-xl text-left text-sm text-gray-700 
+                                         hover:border-green-400 hover:from-green-50 hover:via-white hover:to-green-50
+                                         hover:text-green-700 hover:shadow-md hover:shadow-green-100
+                                         transition-all duration-200 transform hover:-translate-y-0.5"
+                            >
+                              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white 
+                                              border border-gray-100 group-hover:border-green-200 
+                                              group-hover:bg-green-50 transition-colors text-base shadow-sm">
+                                {getIcon(question.icon)}
+                              </span>
+                              <span className="flex-1 font-medium leading-snug">{question.text}</span>
+                              <svg className="w-4 h-4 text-gray-300 group-hover:text-green-500 transition-colors" 
+                                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
                           );
                         })}
                       </div>

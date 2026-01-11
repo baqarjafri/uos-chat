@@ -25,7 +25,7 @@ from psycopg2.extras import RealDictCursor
 
 from config import settings
 from models import (
-    ChatRequest, ChatResponse, Source,
+    ChatRequest, ChatResponse, Source, SuggestedQuestion,
     ConversationResponse, Message, EndConversationResponse,
     FeedbackRequest, FeedbackResponse,
     FeedbackStats, BadFeedbackResponse, BadFeedbackItem,
@@ -35,6 +35,7 @@ from models import (
 # Import our conversational system
 from scripts.conversational_system import ConversationalRAGSystem
 from scripts.feedback_system import FeedbackManager
+from scripts.enhanced_rag import generate_follow_up_questions
 
 
 # ============================================
@@ -227,10 +228,27 @@ async def chat(request: ChatRequest, http_request: Request):
                 # Skip invalid sources
                 continue
         
+        # Generate context-aware follow-up questions
+        suggested_questions = []
+        answer_text = response.get("answer", "")
+        if answer_text and not answer_text.startswith("Sorry"):
+            follow_ups = generate_follow_up_questions(
+                query=request.message,
+                answer=answer_text,
+                detected_programs=response.get("detected_programs", []),
+                student_type=response.get("student_type"),
+                student_level=response.get("student_level")
+            )
+            suggested_questions = [
+                SuggestedQuestion(text=q["text"], icon=q.get("icon"))
+                for q in follow_ups
+            ]
+        
         return ChatResponse(
             session_id=response["session_id"],
             answer=response["answer"],
             sources=sources,
+            suggested_questions=suggested_questions,
             student_type=response.get("student_type"),
             student_level=response.get("student_level"),
             detected_programs=response.get("detected_programs", []),

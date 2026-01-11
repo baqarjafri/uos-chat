@@ -36,6 +36,31 @@ from scripts.lead_manager import LeadManager, LeadData, should_ask_for_name, per
 
 
 # ============================================
+# LEAD CAPTURE CONFIGURATION
+# ============================================
+# These thresholds control when lead capture is triggered.
+# Adjust these values to fine-tune the conversation flow.
+
+LEAD_CAPTURE_CONFIG = {
+    # Minimum turn count before lead capture can be triggered
+    # Turn = one user message + one assistant response
+    "min_turn_count": 12,
+    
+    # Minimum conversation history length (total messages: user + assistant)
+    # This ensures substantive conversation before asking for contact info
+    "min_history_length": 25,
+    
+    # Minimum number of distinct programs user must have discussed
+    # Higher value = more engaged user before triggering lead capture
+    "min_programs_detected": 4,
+    
+    # Cooldown turns after user declines or changes topic during lead capture
+    # Prevents re-triggering lead capture immediately after user exits
+    "cooldown_turns_after_exit": 5,
+}
+
+
+# ============================================
 # STATE DEFINITION
 # ============================================
 
@@ -81,6 +106,11 @@ class ConversationState(TypedDict):
     name_asked: bool  # Whether we've asked for name
     lead_capture_completeness: int  # 0-100 score
     
+    # Lead capture flow control (prevents infinite loop)
+    lead_capture_declined: bool  # User declined to provide contact info
+    lead_capture_cooldown_until: int  # Turn count when cooldown expires
+    in_lead_capture_flow: bool  # Currently in lead capture conversation
+    
     # Control flow
     next_action: str
     turn_count: int
@@ -121,7 +151,14 @@ class RouterAgent:
     
     def __call__(self, state: ConversationState) -> ConversationState:
         """
-        Process user input through router
+        Process user input through router.
+        
+        This is the main routing logic that:
+        1. Runs guardrails for safety
+        2. Detects student profile (type, level, programs)
+        3. Classifies intent
+        4. Manages lead capture flow with proper exit handling
+        5. Routes to appropriate agent (RAG or Lead Capture)
         
         Args:
             state: Current conversation state
@@ -134,8 +171,11 @@ class RouterAgent:
         conversation_id = state.get("conversation_id")
         conversation_history = state.get("conversation_history", [])
         ip_address = state.get("ip_address")
+        turn_count = state.get("turn_count", 0)
         
-        # 1. Run guardrails
+        # ============================================
+        # STEP 1: Run guardrails
+        # ============================================
         is_valid, guardrail_response, guardrail_result = self.guardrails.check_all(
             user_input=user_input,
             session_id=session_id,
@@ -145,7 +185,6 @@ class RouterAgent:
         )
         
         if not is_valid:
-            # Guardrail triggered - return with response
             return {
                 **state,
                 "guardrail_triggered": True,
@@ -154,26 +193,62 @@ class RouterAgent:
                 "next_action": "end"
             }
         
-        # 2. Detect student type and location
+        # ============================================
+        # STEP 2: Detect student profile
+        # ============================================
         student_type, detected_location = self._detect_student_type(user_input, conversation_history)
-        
-        # 3. Detect student level
         student_level = self._detect_student_level(user_input, conversation_history)
-        
-        # 4. Detect programs mentioned
         detected_programs = self._detect_programs(user_input)
         
-        # 5. Classify intent (pass conversation history to avoid false greeting detection)
+        # ============================================
+        # STEP 3: Classify intent
+        # ============================================
         intent, confidence = self._classify_intent(user_input, conversation_history)
         
-        # 6. Check if ready for lead capture
+        # ============================================
+        # STEP 4: Handle lead capture flow control
+        # ============================================
+        # Initialize flow control variables
+        lead_capture_declined = state.get("lead_capture_declined", False)
+        lead_capture_cooldown_until = state.get("lead_capture_cooldown_until", 0)
+        in_lead_capture_flow = state.get("in_lead_capture_flow", False)
+        user_input_lower = user_input.lower()
+        
+        # Check if user is declining lead capture
+        decline_phrases = [
+            "no thanks", "no thank you", "not now", "maybe later", "later",
+            "don't want", "not interested", "skip", "no need", "i'm good",
+            "just browsing", "just looking", "not yet", "i'll pass"
+        ]
+        user_declined = any(phrase in user_input_lower for phrase in decline_phrases)
+        
+        # Check if user changed topic while in lead capture flow
+        topic_changed = False
+        if in_lead_capture_flow:
+            is_new_question = self._is_substantive_question(user_input_lower)
+            has_contact_info = self._contains_contact_info(user_input)
+            topic_changed = is_new_question and not has_contact_info
+        
+        # Handle decline or topic change - set cooldown
+        if user_declined or topic_changed:
+            cooldown_turns = LEAD_CAPTURE_CONFIG["cooldown_turns_after_exit"]
+            lead_capture_cooldown_until = turn_count + cooldown_turns
+            lead_capture_declined = True
+            in_lead_capture_flow = False  # Exit lead capture flow
+        
+        # ============================================
+        # STEP 5: Check lead capture readiness
+        # ============================================
         ready_for_lead_capture = self._check_lead_capture_readiness(
             state, intent, conversation_history
         )
         
-        # 7. Determine next action
-        if ready_for_lead_capture and not state.get("lead_captured", False):
+        # ============================================
+        # STEP 6: Determine next action
+        # ============================================
+        if ready_for_lead_capture and not state.get("lead_captured", False) and not user_declined and not topic_changed:
             next_action = "lead_capture"
+            in_lead_capture_flow = True  # Enter lead capture flow
         elif intent in ["program_inquiry", "fee_question", "requirement_question", "general_question"]:
             next_action = "rag"
         elif intent == "greeting":
@@ -181,7 +256,9 @@ class RouterAgent:
         else:
             next_action = "rag"  # Default to RAG
         
-        # Update state
+        # ============================================
+        # STEP 7: Update and return state
+        # ============================================
         return {
             **state,
             "intent": intent,
@@ -195,6 +272,10 @@ class RouterAgent:
             "ready_for_lead_capture": ready_for_lead_capture,
             "next_action": next_action,
             "guardrail_triggered": False,
+            # Lead capture flow control
+            "lead_capture_declined": lead_capture_declined,
+            "lead_capture_cooldown_until": lead_capture_cooldown_until,
+            "in_lead_capture_flow": in_lead_capture_flow,
             "turn_count": state.get("turn_count", 0) + 1
         }
     
@@ -320,29 +401,160 @@ class RouterAgent:
         intent: str,
         conversation_history: List[Dict]
     ) -> bool:
-        """Check if conversation is ready for lead capture"""
-        turn_count = state.get("turn_count", 0)
+        """
+        Check if conversation is ready for lead capture.
         
-        # NEVER trigger lead capture on first few messages
-        # User needs to have a conversation first before we ask for contact info
+        This function implements a sophisticated lead capture trigger system that:
+        1. Respects configurable thresholds for conversation depth
+        2. Detects when user declines or changes topic to exit lead capture
+        3. Implements cooldown to prevent re-triggering after user exits
+        
+        Returns:
+            bool: True if lead capture should be triggered, False otherwise
+        """
+        turn_count = state.get("turn_count", 0)
+        user_input = state.get("user_input", "").lower()
+        
+        # ============================================
+        # STEP 1: Check if user is in cooldown period
+        # ============================================
+        # If user previously declined or changed topic, respect cooldown
+        cooldown_until = state.get("lead_capture_cooldown_until", 0)
+        if turn_count < cooldown_until:
+            return False
+        
+        # ============================================
+        # STEP 2: Check if user declined lead capture
+        # ============================================
+        # Detect explicit decline phrases
+        decline_phrases = [
+            "no thanks", "no thank you", "not now", "maybe later", "later",
+            "don't want", "not interested", "skip", "no need", "i'm good",
+            "just browsing", "just looking", "not yet", "i'll pass"
+        ]
+        if any(phrase in user_input for phrase in decline_phrases):
+            # User declined - this will trigger cooldown in the router
+            return False
+        
+        # ============================================
+        # STEP 3: Check if user changed topic (new question)
+        # ============================================
+        # If we were in lead capture flow and user asks a substantive question,
+        # they're changing topic - exit lead capture mode
+        if state.get("in_lead_capture_flow", False):
+            # Check if current message is a new question (not contact info)
+            is_new_question = self._is_substantive_question(user_input)
+            has_contact_info = self._contains_contact_info(user_input)
+            
+            if is_new_question and not has_contact_info:
+                # User changed topic - exit lead capture
+                return False
+        
+        # ============================================
+        # STEP 4: Check minimum thresholds from config
+        # ============================================
+        # Use configurable thresholds for when to trigger lead capture
+        min_turns = LEAD_CAPTURE_CONFIG["min_turn_count"]
+        min_history = LEAD_CAPTURE_CONFIG["min_history_length"]
+        min_programs = LEAD_CAPTURE_CONFIG["min_programs_detected"]
+        
+        # NEVER trigger on early messages
         if turn_count < 3:
             return False
         
-        # ONLY ready after 8+ turns of substantive conversation
-        # This ensures natural flow before asking for contact info
-        if turn_count >= 8 and len(conversation_history) >= 16:
-            # Check if user has shown genuine interest
+        # Check if conversation meets depth requirements
+        if turn_count >= min_turns and len(conversation_history) >= min_history:
             detected_programs = state.get("detected_programs", [])
-            if len(detected_programs) >= 2:
+            if len(detected_programs) >= min_programs:
                 return True
         
-        # Or ONLY if user explicitly requests contact (not just asking how to apply)
-        user_input = state.get("user_input", "").lower()
-        if any(phrase in user_input for phrase in [
+        # ============================================
+        # STEP 5: Check for explicit contact request
+        # ============================================
+        # User explicitly asks to be contacted (always honor this)
+        explicit_contact_phrases = [
             "send me information", "contact me", "email me details",
-            "connect me with admissions", "speak to someone", "talk to a person"
-        ]):
+            "connect me with admissions", "speak to someone", "talk to a person",
+            "can someone call me", "i want to speak to", "get in touch"
+        ]
+        if any(phrase in user_input for phrase in explicit_contact_phrases):
             return True
+        
+        return False
+    
+    def _is_substantive_question(self, user_input: str) -> bool:
+        """
+        Detect if user input is a substantive question (not just providing contact info).
+        
+        This helps identify when a user changes topic during lead capture flow.
+        
+        Args:
+            user_input: The user's message
+            
+        Returns:
+            bool: True if this appears to be a new question
+        """
+        user_lower = user_input.lower()
+        
+        # Question indicators
+        question_words = ['what', 'how', 'when', 'where', 'why', 'which', 'can', 'do', 'is', 'are', 'will']
+        question_phrases = [
+            'tell me about', 'i want to know', 'could you explain',
+            'what about', 'how about', 'i have a question'
+        ]
+        
+        # Check for question marks or question words at start
+        if '?' in user_input:
+            return True
+        
+        words = user_lower.split()
+        if words and words[0] in question_words:
+            return True
+        
+        if any(phrase in user_lower for phrase in question_phrases):
+            return True
+        
+        # Topic keywords that indicate a new question
+        topic_keywords = [
+            'fee', 'cost', 'tuition', 'scholarship', 'requirement', 'deadline',
+            'course', 'program', 'degree', 'accommodation', 'visa', 'apply',
+            'admission', 'intake', 'semester', 'campus', 'faculty'
+        ]
+        if any(keyword in user_lower for keyword in topic_keywords):
+            return True
+        
+        return False
+    
+    def _contains_contact_info(self, user_input: str) -> bool:
+        """
+        Check if user input contains contact information (email, phone, name).
+        
+        Args:
+            user_input: The user's message
+            
+        Returns:
+            bool: True if contact info is detected
+        """
+        # Email pattern
+        email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        if re.search(email_pattern, user_input):
+            return True
+        
+        # Phone pattern (various formats)
+        phone_pattern = r'[\+]?[(]?[0-9]{1,3}[)]?[-\s\.]?[0-9]{3,4}[-\s\.]?[0-9]{4,6}'
+        if re.search(phone_pattern, user_input):
+            return True
+        
+        # Name introduction patterns
+        name_patterns = [
+            r"my name is",
+            r"i'?m ([A-Z][a-z]+)",
+            r"this is ([A-Z][a-z]+)",
+            r"call me"
+        ]
+        for pattern in name_patterns:
+            if re.search(pattern, user_input, re.IGNORECASE):
+                return True
         
         return False
 
@@ -426,56 +638,68 @@ What brings you to Stirling today? Are you looking at:
     
     def _build_enhanced_query(self, state: ConversationState) -> str:
         """
-        Build an enhanced search query using ChatGPT-style context management:
-        - Full conversation history (last N user messages)
-        - Detected entities (level, location, nationality, programs)
-        - Current question
+        Build a CLEAN search query optimized for vector similarity.
         
-        This ensures robust context retention for follow-up questions.
+        Key principle: When user switches topics, search ONLY for the new topic.
+        Don't pollute the query with old conversation context.
         """
-        query_parts = []
-        
-        # 1. DETECTED ENTITIES - accumulated across conversation
-        
-        # 1a. Programs of interest
-        detected_programs = state.get("detected_programs", [])
-        if detected_programs:
-            query_parts.extend(detected_programs)
-        
-        # 1b. Level of study (undergrad, postgrad, PhD, research, short courses)
-        student_level = state.get("student_level")
-        if student_level and student_level != "unknown":
-            query_parts.append(student_level)
-        
-        # 1c. Student type / Nationality (scottish, uk, eu, international)
-        student_type = state.get("student_type")
-        if student_type and student_type != "unknown":
-            query_parts.append(f"{student_type} student")
-        
-        # 1d. Current location / Detected location
-        detected_location = state.get("detected_location")
-        if detected_location:
-            query_parts.append(detected_location)
-        
-        # 2. FULL CONVERSATION HISTORY - include last 3 user messages completely
-        # This is the key fix: don't just extract keywords, include full context
-        conversation_history = state.get("conversation_history", [])
-        if conversation_history:
-            # Extract last 3 user messages (full content, not just keywords)
-            user_messages = [
-                msg["content"] for msg in conversation_history
-                if msg.get("role") == "user"
-            ][-3:]  # Last 3 user messages
-            query_parts.extend(user_messages)
-        
-        # 3. CURRENT QUESTION
         user_input = state.get("user_input", "")
-        query_parts.append(user_input)
+        user_input_lower = user_input.lower()
         
-        # Join all parts (no dedup - we want full context)
-        enhanced_query = " ".join(query_parts)
+        # Step 1: Check if user is asking about a NEW specific topic/program
+        # If yes, search ONLY for that - don't add old context
+        new_topic_detected = self._extract_new_topic(user_input_lower)
+        if new_topic_detected:
+            # User mentioned a specific new topic - search cleanly for it
+            return user_input
         
-        return enhanced_query
+        # Step 2: Check if this is a vague follow-up question
+        vague_indicators = [
+            'this program', 'this course', 'the program', 'the course',
+            'it', 'that', 'what about', 'how much', 'when is', 'tell me more',
+            'what are the', 'how long', 'the fees', 'the requirements', 'the deadline'
+        ]
+        is_vague_followup = any(indicator in user_input_lower for indicator in vague_indicators)
+        
+        # Step 3: For vague follow-ups, add ONLY the most recent program context
+        if is_vague_followup:
+            detected_programs = state.get("detected_programs", [])
+            if detected_programs:
+                # Use only the LAST detected program (current focus)
+                current_program = detected_programs[-1]
+                return f"{current_program} {user_input}"
+        
+        # Step 4: For standalone questions, just use the question itself
+        # Don't add student type, location, or history - keep it clean
+        return user_input
+    
+    def _extract_new_topic(self, user_input_lower: str) -> bool:
+        """
+        Detect if user is asking about a NEW specific topic.
+        Returns True if a new program/subject is mentioned.
+        """
+        # Common program/subject keywords that indicate a new topic
+        subject_keywords = [
+            'economics', 'business', 'psychology', 'nursing', 'law', 'education',
+            'computer science', 'computing', 'data science', 'artificial intelligence',
+            'ai', 'marketing', 'finance', 'accounting', 'management', 'mba',
+            'biology', 'chemistry', 'physics', 'mathematics', 'english', 'history',
+            'sociology', 'criminology', 'sport', 'media', 'journalism', 'film',
+            'environmental', 'sustainability', 'aquaculture', 'marine', 'ecology'
+        ]
+        
+        # Check if any subject keyword is in the input
+        for subject in subject_keywords:
+            if subject in user_input_lower:
+                return True
+        
+        # Also detect degree type mentions as new topics
+        degree_patterns = ['msc', 'bsc', 'ba', 'ma', 'phd', 'mba', 'llm', 'pgde']
+        for pattern in degree_patterns:
+            if pattern in user_input_lower:
+                return True
+        
+        return False
     
     def _generate_greeting(self, state: ConversationState) -> str:
         """Generate friendly greeting with name personalization"""
@@ -1092,7 +1316,11 @@ class ConversationalRAGSystem:
                     # Progressive lead capture fields
                     "user_name": None,
                     "name_asked": False,
-                    "lead_capture_completeness": 0
+                    "lead_capture_completeness": 0,
+                    # Lead capture flow control (prevents infinite loop)
+                    "lead_capture_declined": False,
+                    "lead_capture_cooldown_until": 0,
+                    "in_lead_capture_flow": False
                 }
         
         session = self.sessions[session_id]
@@ -1125,6 +1353,10 @@ class ConversationalRAGSystem:
             user_name=session.get("user_name"),
             name_asked=session.get("name_asked", False),
             lead_capture_completeness=session.get("lead_capture_completeness", 0),
+            # Lead capture flow control (prevents infinite loop)
+            lead_capture_declined=session.get("lead_capture_declined", False),
+            lead_capture_cooldown_until=session.get("lead_capture_cooldown_until", 0),
+            in_lead_capture_flow=session.get("in_lead_capture_flow", False),
             next_action="router",
             turn_count=len(session["messages"]) // 2,
             guardrail_triggered=False,
@@ -1177,6 +1409,10 @@ class ConversationalRAGSystem:
         session["user_name"] = final_state.get("user_name") or session.get("user_name")
         session["name_asked"] = final_state.get("name_asked", session.get("name_asked", False))
         session["lead_capture_completeness"] = final_state.get("lead_capture_completeness", 0)
+        # Lead capture flow control (prevents infinite loop)
+        session["lead_capture_declined"] = final_state.get("lead_capture_declined", session.get("lead_capture_declined", False))
+        session["lead_capture_cooldown_until"] = final_state.get("lead_capture_cooldown_until", session.get("lead_capture_cooldown_until", 0))
+        session["in_lead_capture_flow"] = final_state.get("in_lead_capture_flow", session.get("in_lead_capture_flow", False))
         
         # Update conversation profile
         self.conversation_manager.update_conversation_profile(

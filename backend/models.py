@@ -39,11 +39,18 @@ class Source(BaseModel):
     relevance_score: Optional[float] = None
 
 
+class SuggestedQuestion(BaseModel):
+    """Suggested follow-up question for quick replies"""
+    text: str
+    icon: Optional[str] = None
+
+
 class ChatResponse(BaseModel):
     """Response model for chat endpoint"""
     session_id: str
     answer: str
     sources: List[Source] = []
+    suggested_questions: List[SuggestedQuestion] = []
     student_type: Optional[str] = None
     student_level: Optional[str] = None
     detected_programs: List[str] = []
