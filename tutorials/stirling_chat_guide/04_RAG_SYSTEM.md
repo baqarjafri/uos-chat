@@ -244,11 +244,11 @@ class AnswerGenerator:
         system_prompt = self._build_system_prompt(student_type, student_level)
         user_prompt = self._build_user_prompt(query, context, conversation_history)
         
-        # Call Claude
+        # Call Claude Sonnet 4 (upgraded for superior quality)
         response = self.client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=500,
-            temperature=0.7,
+            max_tokens=750,  # Increased for more detailed answers
+            temperature=0.7,  # Natural conversational tone
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}]
         )

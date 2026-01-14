@@ -10,6 +10,7 @@ Created: 2025-11-20
 
 from pydantic_settings import BaseSettings
 from typing import Optional
+import os
 
 
 class Settings(BaseSettings):
@@ -22,13 +23,21 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
     ANTHROPIC_API_KEY: str
     
-    # CORS
+    # CORS - Will be updated based on environment
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    
+    # Environment detection
+    ENVIRONMENT: str = "development"
     
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     DEBUG: bool = False
+    
+    # Railway specific settings
+    RAILWAY_ENVIRONMENT: str = ""
+    RAILWAY_SERVICE_NAME: str = ""
+    PORT = int(os.environ.get("PORT", 8000))  # Railway sets PORT env var
     
     # Rate Limiting (optional)
     RATE_LIMIT_PER_MINUTE: int = 60

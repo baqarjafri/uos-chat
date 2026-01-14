@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     # Optional with defaults
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
     HOST: str = "0.0.0.0"
-    PORT: int = 8000
+    PORT: int = 8001
     DEBUG: bool = False
     RATE_LIMIT_PER_MINUTE: int = 60
     
@@ -97,7 +97,7 @@ app.add_middleware(
 ### Why CORS Matters
 
 ```
-Frontend (localhost:3000) ──POST──▶ Backend (localhost:8000)
+Frontend (localhost:3000) ──POST──▶ Backend (localhost:8001)
                                           │
                                           ▼
                                     CORS Check:
@@ -546,15 +546,15 @@ Open `backend/models.py` and:
 
 ```bash
 # Health check
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 
 # Send a chat message
-curl -X POST http://localhost:8000/api/chat \
+curl -X POST http://localhost:8001/api/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Hello"}'
 
 # Open Swagger UI
-# Navigate to: http://localhost:8000/docs
+# Navigate to: http://localhost:8001/docs
 ```
 
 ---

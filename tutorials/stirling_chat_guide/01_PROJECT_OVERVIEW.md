@@ -46,7 +46,7 @@ An AI chatbot that:
 | Technology | Purpose | File Location |
 |------------|---------|---------------|
 | **OpenAI API** | Text embeddings (text-embedding-3-small) | `scripts/enhanced_rag.py` |
-| **Anthropic API** | LLM responses (Claude Sonnet) | `scripts/enhanced_rag.py` |
+| **Anthropic API** | LLM responses (Claude Sonnet 4) | `scripts/enhanced_rag.py` |
 | **pgvector** | Vector similarity search | PostgreSQL extension |
 
 ### Frontend (JavaScript)
@@ -155,15 +155,35 @@ This ensures:
 - "MSc AI fees" finds content about "Artificial Intelligence tuition"
 - Exact terms like "£24,300" are matched precisely
 
-### Why Claude Sonnet?
+### Why Claude Sonnet 4?
 
-| Model | Cost | Quality | Speed |
-|-------|------|---------|-------|
-| Claude Haiku | Cheapest | Good | Fastest |
-| **Claude Sonnet** | **Balanced** | **Best** | **Fast** |
-| Claude Opus | Expensive | Best | Slower |
+| Model | Cost/Month | Quality | Speed | Best For |
+|-------|------------|---------|-------|----------|
+| Claude Haiku | $1.35 | Good | Fastest | Budget MVP |
+| **Claude Sonnet 4** | **$16.20** | **Excellent** | **Fast** | **Production** |
+| Claude Opus | $50+ | Best | Slower | Premium |
 
-Sonnet provides the best quality/cost balance for production use.
+**Current Choice**: Claude Sonnet 4 (upgraded for superior quality)
+
+**Cost Impact**: 12x increase vs Haiku, but provides:
+- Better reasoning for complex queries
+- More accurate factual responses
+- Superior instruction following
+- Professional tone for university use case
+
+### 💰 Cost Analysis (50 queries/day)
+
+**Current Configuration (Sonnet 4)**:
+- Input tokens: 3.15M × $3.00 = $9.45
+- Output tokens: 0.45M × $15.00 = $6.75
+- **Total: $16.20/month**
+
+**Alternative (Haiku)**:
+- Input tokens: 3.15M × $0.25 = $0.79
+- Output tokens: 0.45M × $1.25 = $0.56
+- **Total: $1.35/month**
+
+**💡 Cost Optimization Tip**: Consider hybrid approach - use Haiku for simple queries, Sonnet 4 for complex comparisons.
 
 ---
 

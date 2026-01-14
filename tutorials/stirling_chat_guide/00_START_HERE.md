@@ -150,7 +150,7 @@ User query → OpenAI Embeddings → Vector search in pgvector
     ↓
 Top 5 relevant chunks retrieved
     ↓
-Chunks + query → Claude Sonnet → Generated answer
+Chunks + query → Claude Sonnet 4 → Generated answer
 ```
 
 ### 4. Response Returned

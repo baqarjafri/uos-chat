@@ -461,10 +461,14 @@ class AnswerGenerator:
             (student_level and student_level != 'unknown')
         )
         
-        # If search quality is low AND we have no context, ask clarifying questions
-        # But if we have context, let the LLM use it intelligently
-        if avg_score < RAGConfig.LOW_QUALITY_THRESHOLD and not has_useful_context:
+        # SMART HANDLING: Never give up - always try to help or ask smart questions
+        # Only generate clarification when we have NO useful context AND NO search results
+        # If we have ANY results or context, let the LLM use them intelligently with instructions to ask clarifying questions
+        if avg_score < RAGConfig.LOW_QUALITY_THRESHOLD and not has_useful_context and not search_results:
             return self._generate_clarification_response(query, search_results, conversation_history, student_type, student_level, detected_programs)
+        
+        # Even with low scores, if we have SOME results, proceed to answer generation
+        # The system prompt instructs the LLM to share what it knows and ask clarifying questions
         
         # Build context from search results
         context = self._build_context(search_results)
@@ -483,7 +487,7 @@ class AnswerGenerator:
         # Response time ~8-12 seconds
         response = self.client.messages.create(
             model="claude-sonnet-4-20250514",
-            max_tokens=1000,
+            max_tokens=750,
             temperature=0.7,  # Natural conversational tone (default is 1.0)
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}]
@@ -584,18 +588,71 @@ STEP 3: Is the user asking about a topic where you need more details to help?
 GOLDEN RULE: If context has ANY relevant information, USE IT. Never say "I don't have information" when the context contains related content. Extract value from what you have.
 
 ═══════════════════════════════════════════════════════════════
-TOPIC SWITCHING - CRITICAL
+NEVER SAY "I DON'T HAVE INFORMATION" - CRITICAL RULE
 ═══════════════════════════════════════════════════════════════
 
-When user switches to a NEW topic (e.g., from AI to Economics):
-- IGNORE previous conversation topics completely
-- Focus ONLY on the new topic they're asking about
-- The context provided is already filtered for their NEW question
-- Never say "I see you're now interested in X instead of Y" - just answer about X
-- Never reference what you discussed before unless user explicitly asks
+BANNED PHRASES - NEVER USE THESE:
+❌ "I don't have information about..."
+❌ "Unfortunately, I don't have specific details..."
+❌ "I'm sorry, but I don't have that information..."
+❌ "The information isn't available in my context..."
+❌ "I couldn't find information about..."
 
-BAD: "I can see you're interested in Economics now. Unfortunately, I don't have specific information about PhD programs in Economics - the context I have covers AI programs."
-GOOD: "For PhD Economics at Stirling, you'll need [answer from context]..."
+INSTEAD, USE THIS APPROACH:
+1. Share ANY related information you DO have from context
+2. Ask ONE specific clarifying question to narrow down the search
+3. Guide user to provide details that will improve relevance
+
+TRANSFORMATION EXAMPLES:
+
+BAD: "I don't have information about PhD Economics fees."
+GOOD: "I have information about PhD programs at Stirling. Are you looking at Economics specifically? Also, are you a UK or international student? Fees vary significantly based on this."
+
+BAD: "Unfortunately, I don't have details about January intake for MSc Data Science."
+GOOD: "MSc programs at Stirling typically have September and January intakes. For MSc Data Science specifically, could you tell me if you're a UK or international student? That will help me find the exact intake dates and deadlines for you."
+
+BAD: "I don't have information about scholarships for Pakistani students."
+GOOD: "Stirling offers various scholarships for international students. Which program are you interested in? Scholarship availability often depends on the specific course and level of study."
+
+BAD: "I can't find specific IELTS requirements for this program."
+GOOD: "Entry requirements vary by program. Most postgraduate courses require IELTS 6.0-6.5. Which specific program are you applying for? I can give you the exact requirements."
+
+STRATEGY: Turn "I don't know" into "Here's what I know, tell me more so I can help better"
+
+═══════════════════════════════════════════════════════════════
+CONTEXT RETENTION & TOPIC CONTINUITY - CRITICAL
+═══════════════════════════════════════════════════════════════
+
+ANALYZE EACH NEW QUESTION using this decision tree:
+
+1. Is this question RELATED to the previous topic? (same program, same subject area, follow-up detail)
+   → YES: Build on previous context. Use information from earlier in conversation.
+   → Example: Previous: "MSc AI requirements?" → Current: "What about fees?" 
+   → Action: Answer about MSc AI fees using known program context
+
+2. Is this a COMPLETELY NEW topic? (different program, different subject area)
+   → YES: Start fresh. Ignore previous program/topic. Focus only on new question.
+   → Example: Previous: "MSc AI" → Current: "Tell me about Economics PhD"
+   → Action: Answer ONLY about Economics PhD. Don't mention AI.
+
+3. Is this a CLARIFICATION or DETAIL about current topic?
+   → YES: This is still the same conversation thread. Maintain all context.
+   → Example: Previous: "MSc AI fees?" → Current: "For international students"
+   → Action: Combine - answer about MSc AI fees for international students
+
+SMART CONTEXT RULES:
+- If user mentions a NEW program name → that becomes the active topic (fresh start)
+- If user asks follow-up WITHOUT program name → use the last mentioned program
+- If user says "what about [NEW PROGRAM]" → switch context completely to new program
+- If user asks "and for international?" → they're adding detail to CURRENT topic
+- Combine user profile (student_type, level) with current topic for personalized answers
+
+TOPIC SWITCH DETECTION:
+- New program/subject mentioned = TOPIC SWITCH (answer only about new topic)
+- Same topic + new detail = CONTINUATION (build on previous context)
+- Vague follow-up = CONTINUATION (use last known program)
+
+NEVER say "I see you've switched from X to Y" - just answer about Y naturally.
 
 ═══════════════════════════════════════════════════════════════
 CORE RULES
@@ -614,7 +671,7 @@ CORE RULES
 RESPONSE STYLE
 ═══════════════════════════════════════════════════════════════
 
-- Be CONCISE: 50-100 words for simple questions, 150 max for complex
+- Be CONCISE: 40-80 words for simple questions, 110 max for complex
 - Sound HUMAN: Write like texting a friend, use contractions (it's, you'll, don't)
 - Jump straight to the answer - no preambles like "Great question!" or "I'd be happy to help!"
 - NEVER repeat the user's question back to them
@@ -660,9 +717,39 @@ URL FORMATTING (CRITICAL)
 - NEVER use double brackets [[ - always single [
 - NEVER start a line with [ unless it's a complete markdown link [text](url)
 - NEVER use [ for bullet points or list items - use • or - instead
-- Include up to 2 relevant links per response
 - Make link text the program name or page title, not "click here"
 - Use URLs from context's source URLs for program pages
+
+═══════════════════════════════════════════════════════════════
+AUTO-LINK PROGRAM NAMES (CRITICAL - ALWAYS DO THIS)
+═══════════════════════════════════════════════════════════════
+
+WHENEVER you mention a specific program name in your response, AUTOMATICALLY hyperlink it to its URL from the context.
+
+RULE: The FIRST mention of any program name in your response MUST be a clickable link.
+
+HOW TO DO IT:
+1. Look at the context's source URLs for the program page
+2. When you first mention the program, wrap it in markdown link format
+3. Subsequent mentions can be plain text
+
+EXAMPLES:
+
+BAD (no link): "MSc Artificial Intelligence at Stirling focuses on machine learning and data science."
+GOOD (auto-linked): "[MSc Artificial Intelligence](https://www.stir.ac.uk/courses/pg/artificial-intelligence/) at Stirling focuses on machine learning and data science."
+
+BAD: "The fees for MSc Data Science are £24,300 for international students."
+GOOD: "The fees for [MSc Data Science](https://www.stir.ac.uk/courses/pg/data-science/) are **£24,300** for international students."
+
+BAD: "PhD Economics has flexible start dates throughout the year."
+GOOD: "[PhD Economics](https://www.stir.ac.uk/courses/research/economics/) has flexible start dates throughout the year."
+
+WHEN TO AUTO-LINK:
+- Any MSc, MA, MBA, BSc, BA, PhD, or other degree program mentioned
+- Use the URL from the context's source URLs
+- If no URL in context, still mention the program but without link
+
+This makes it easy for users to click and explore the program page directly!
 
 ═══════════════════════════════════════════════════════════════
 FEES
@@ -702,20 +789,24 @@ ESCALATION (Use sparingly - only after trying to help first)
 NEVER escalate on the first message - always try to help or ask clarifying questions first!
 
 ═══════════════════════════════════════════════════════════════
-CONTACT DETAILS FORMATTING
+CONTACT DETAILS FORMATTING (CRITICAL - ICON PLACEMENT)
 ═══════════════════════════════════════════════════════════════
 
-When mentioning contact details, always use these exact formats (UI will auto-link them):
-- Email: admissions@stir.ac.uk (plain text, no markdown)
-- Phone: +44 1786 467044 (with +44 prefix and spaces)
+When mentioning contact details, ALWAYS put the icon/emoji BEFORE the contact detail:
+- Email format: 📧 admissions@stir.ac.uk (emoji BEFORE email, plain text)
+- Phone format: 📞 +44 1786 467044 (emoji BEFORE phone, with +44 prefix)
 - Never wrap emails or phone numbers in markdown links - just write them as plain text
+- CRITICAL: Icon must come BEFORE the contact detail, NEVER after
+
+CORRECT: "Contact us at 📧 admissions@stir.ac.uk or 📞 +44 1786 467044"
+WRONG: "Contact us at admissions@stir.ac.uk 📧 or +44 1786 467044 📞"
 
 ═══════════════════════════════════════════════════════════════
 FAREWELLS
 ═══════════════════════════════════════════════════════════════
 
 When user says bye/thanks/cheers:
-"Good luck with your application! Reach out anytime - admissions@stir.ac.uk or +44 1786 467044. Take care!"
+"Good luck with your application! Reach out anytime - 📧 admissions@stir.ac.uk or 📞 +44 1786 467044. Take care!"
 
 ═══════════════════════════════════════════════════════════════
 EXAMPLES
@@ -1034,7 +1125,7 @@ Just share your name and email, and they'll get back to you within 1-2 business 
 
 
 # ============================================
-# FOLLOW-UP QUESTION GENERATOR
+# FOLLOW-UP QUESTION GENERATOR - CONTEXT-AWARE
 # ============================================
 
 def generate_follow_up_questions(
@@ -1045,78 +1136,106 @@ def generate_follow_up_questions(
     student_level: str = None
 ) -> List[Dict]:
     """
-    Generate 2 context-aware follow-up questions based on conversation topic.
+    Generate 2 HIGHLY SPECIFIC context-aware follow-up questions.
+    Questions are personalized to the user's exact situation including:
+    - Their specific program of interest
+    - Their student type (UK/international)
+    - Their study level (undergraduate/postgraduate)
+    
     Returns list of dicts with 'text' and 'icon' keys.
     """
+    import re
+    
     query_lower = query.lower()
     answer_lower = answer.lower()
+    detected_programs = detected_programs or []
     
-    # Comprehensive question bank organized by topic
+    # Build context-specific components for question personalization
+    # Use the most recent program (last in list) as it's the current focus
+    program_name = detected_programs[-1] if detected_programs else None
+    
+    # Build student context string (e.g., "as an international student")
+    student_context = ""
+    if student_type and student_type not in ['unknown', None]:
+        if student_type == 'international':
+            student_context = "as an international student "
+        elif student_type == 'uk':
+            student_context = "as a UK student "
+        elif student_type == 'scottish':
+            student_context = "as a Scottish student "
+    
+    # Build level context string
+    level_context = ""
+    if student_level and student_level not in ['unknown', None]:
+        level_context = f"for {student_level} "
+    
+    # HIGHLY SPECIFIC question templates with context injection
+    # These use {program}, {student}, {level} placeholders
     question_bank = {
         'fees': [
-            {"text": "What scholarships can help reduce my tuition fees?", "icon": "award"},
-            {"text": "Can I pay my tuition fees in monthly installments?", "icon": "credit-card"},
-            {"text": "Are there any additional costs I should budget for?", "icon": "receipt"},
+            {"text": "What scholarships are available {student}for {program}?", "icon": "award"},
+            {"text": "Can I pay {program} fees in installments {student}?", "icon": "credit-card"},
+            {"text": "What's the total yearly cost including accommodation {student}?", "icon": "receipt"},
         ],
         'courses': [
-            {"text": "What are the entry requirements for this program?", "icon": "clipboard"},
-            {"text": "What career opportunities does this degree lead to?", "icon": "briefcase"},
-            {"text": "Is there a part-time study option available?", "icon": "clock"},
+            {"text": "What IELTS score do I need {student}for {program}?", "icon": "globe"},
+            {"text": "What career paths do {program} graduates pursue?", "icon": "briefcase"},
+            {"text": "Is there a part-time option for {program}?", "icon": "clock"},
         ],
         'requirements': [
-            {"text": "What IELTS or English language score do I need?", "icon": "globe"},
-            {"text": "Do you consider work experience in place of qualifications?", "icon": "briefcase"},
-            {"text": "How do I submit my application and documents?", "icon": "send"},
+            {"text": "What English language score do I need {student}for {program}?", "icon": "globe"},
+            {"text": "Does {program} accept work experience instead of qualifications?", "icon": "briefcase"},
+            {"text": "When is the application deadline {student}for {program}?", "icon": "calendar"},
         ],
         'scholarships': [
-            {"text": "When is the deadline to apply for scholarships?", "icon": "calendar"},
-            {"text": "Can I combine multiple scholarships together?", "icon": "layers"},
-            {"text": "What documents do I need for the scholarship application?", "icon": "file"},
+            {"text": "What is the scholarship deadline {student}for {program}?", "icon": "calendar"},
+            {"text": "Can I combine multiple scholarships {student}?", "icon": "layers"},
+            {"text": "What documents do I need for scholarship application {student}?", "icon": "file"},
         ],
         'application': [
-            {"text": "What documents do I need to complete my application?", "icon": "file"},
-            {"text": "How long does the application decision take?", "icon": "clock"},
-            {"text": "Can I defer my offer to the next intake?", "icon": "calendar"},
+            {"text": "What documents do I need to apply {student}for {program}?", "icon": "file"},
+            {"text": "How long does the application decision take for {program}?", "icon": "clock"},
+            {"text": "What are the tuition fees {student}for {program}?", "icon": "pound"},
         ],
         'accommodation': [
-            {"text": "How much does on-campus accommodation cost per month?", "icon": "home"},
-            {"text": "Is accommodation guaranteed for international students?", "icon": "shield"},
-            {"text": "What amenities are included in the accommodation?", "icon": "list"},
+            {"text": "Is accommodation guaranteed {student}?", "icon": "shield"},
+            {"text": "What's the monthly cost for on-campus housing {student}?", "icon": "home"},
+            {"text": "Can I apply for accommodation before getting my visa?", "icon": "key"},
         ],
         'visa': [
-            {"text": "What is the process to apply for a UK student visa?", "icon": "passport"},
-            {"text": "Can I work part-time while studying on a student visa?", "icon": "briefcase"},
-            {"text": "When should I start my visa application process?", "icon": "calendar"},
+            {"text": "When should I start my visa application for {program}?", "icon": "calendar"},
+            {"text": "Can I work part-time while studying {program} on a student visa?", "icon": "briefcase"},
+            {"text": "What financial proof do I need for my visa application?", "icon": "receipt"},
         ],
         'intake': [
-            {"text": "What is the application deadline for this intake?", "icon": "calendar"},
-            {"text": "What are the tuition fees for international students?", "icon": "pound"},
-            {"text": "How do I apply for this intake?", "icon": "send"},
+            {"text": "What is the application deadline {student}for {program}?", "icon": "calendar"},
+            {"text": "What are the fees {student}for {program}?", "icon": "pound"},
+            {"text": "What documents do I need to apply {student}for {program}?", "icon": "file"},
         ],
         'campus': [
             {"text": "What sports and recreational facilities are available?", "icon": "activity"},
-            {"text": "How do I get from the campus to Stirling city centre?", "icon": "map"},
-            {"text": "What student support services are available?", "icon": "heart"},
+            {"text": "How do I get from campus to Stirling city centre?", "icon": "map"},
+            {"text": "What student support services are available {student}?", "icon": "heart"},
         ],
         'default': [
-            {"text": "What are the tuition fees for this program?", "icon": "pound"},
-            {"text": "When is the next application deadline?", "icon": "calendar"},
-            {"text": "What scholarships are available for students?", "icon": "award"},
+            {"text": "What are the tuition fees {student}for {program}?", "icon": "pound"},
+            {"text": "What IELTS or English score do I need {student}for {program}?", "icon": "globe"},
+            {"text": "When is the application deadline {student}for {program}?", "icon": "calendar"},
         ]
     }
     
-    # Detect primary topic from query
+    # Topic detection from query keywords
     topic = 'default'
     topic_keywords = {
-        'fees': ['fee', 'cost', 'tuition', 'price', 'pay', 'expensive', 'afford'],
-        'courses': ['course', 'program', 'degree', 'msc', 'bsc', 'study', 'module', 'curriculum'],
-        'requirements': ['requirement', 'qualify', 'eligible', 'need', 'ielts', 'gpa', 'grade'],
-        'scholarships': ['scholarship', 'bursary', 'funding', 'financial aid', 'discount'],
-        'application': ['apply', 'application', 'submit', 'deadline', 'ucas', 'offer'],
-        'accommodation': ['accommodation', 'housing', 'residence', 'dorm', 'room', 'flat'],
-        'visa': ['visa', 'immigration', 'cas', 'tier 4', 'sponsor'],
-        'intake': ['intake', 'semester', 'start date', 'january', 'september', 'when can i start'],
-        'campus': ['campus', 'facility', 'library', 'gym', 'sport', 'location', 'city'],
+        'fees': ['fee', 'cost', 'tuition', 'price', 'pay', 'expensive', 'afford', 'pound', '£'],
+        'courses': ['course', 'program', 'degree', 'msc', 'bsc', 'study', 'module', 'curriculum', 'syllabus'],
+        'requirements': ['requirement', 'qualify', 'eligible', 'need', 'ielts', 'gpa', 'grade', 'entry'],
+        'scholarships': ['scholarship', 'bursary', 'funding', 'financial aid', 'discount', 'award'],
+        'application': ['apply', 'application', 'submit', 'deadline', 'ucas', 'offer', 'how to apply'],
+        'accommodation': ['accommodation', 'housing', 'residence', 'dorm', 'room', 'flat', 'living'],
+        'visa': ['visa', 'immigration', 'cas', 'tier 4', 'sponsor', 'uk visa'],
+        'intake': ['intake', 'semester', 'start date', 'january', 'september', 'when can i start', 'term'],
+        'campus': ['campus', 'facility', 'library', 'gym', 'sport', 'location', 'city', 'stirling'],
     }
     
     for topic_name, keywords in topic_keywords.items():
@@ -1132,20 +1251,30 @@ def generate_follow_up_questions(
                 break
     
     # Get questions for detected topic
-    questions = question_bank.get(topic, question_bank['default']).copy()
+    raw_questions = question_bank.get(topic, question_bank['default']).copy()
     
-    # Personalize with detected program name if available
-    if detected_programs and len(detected_programs) > 0:
-        program = detected_programs[0]
-        questions = [
-            {
-                "text": q["text"].replace("this program", program).replace("this degree", program),
-                "icon": q["icon"]
-            }
-            for q in questions
-        ]
+    # Replace placeholders with actual context
+    # Use "this program" as fallback if no program detected
+    program_text = program_name if program_name else "this program"
     
-    return questions[:2]  # Limit to 2 questions for cleaner UI
+    personalized_questions = []
+    for q in raw_questions:
+        text = q["text"]
+        # Replace placeholders
+        text = text.replace("{program}", program_text)
+        text = text.replace("{student}", student_context)
+        text = text.replace("{level}", level_context)
+        # Clean up extra spaces from empty placeholders
+        text = re.sub(r'\s+', ' ', text).strip()
+        # Clean up trailing "for this program" if it sounds awkward
+        text = text.replace(" for this program?", "?") if not program_name else text
+        
+        personalized_questions.append({
+            "text": text,
+            "icon": q["icon"]
+        })
+    
+    return personalized_questions[:2]  # Limit to 2 questions for cleaner UI
 
 
 # ============================================

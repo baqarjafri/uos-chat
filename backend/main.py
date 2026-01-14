@@ -188,13 +188,6 @@ async def chat(request: ChatRequest, http_request: Request):
         raise HTTPException(status_code=503, detail="RAG system not initialized")
     
     try:
-        # Reset any bad transactions
-        if db_connection:
-            try:
-                db_connection.rollback()
-            except:
-                pass
-        
         # Get user IP address
         ip_address = http_request.client.host if http_request.client else None
         

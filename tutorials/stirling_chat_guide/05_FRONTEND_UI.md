@@ -54,7 +54,7 @@ frontend/
 
 ```javascript
 // API base URL - uses environment variable or defaults to localhost
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
 export const API_ENDPOINTS = {
   CHAT: `${API_BASE_URL}/api/chat`,
