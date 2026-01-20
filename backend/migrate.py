@@ -36,6 +36,7 @@ def setup_database():
             CREATE TABLE IF NOT EXISTS documents (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 source_url TEXT NOT NULL,
+                url TEXT,
                 category VARCHAR(50) NOT NULL,
                 title TEXT NOT NULL,
                 full_content TEXT NOT NULL,
@@ -43,6 +44,14 @@ def setup_database():
                 metadata JSONB
             );
         """)
+        
+        # Add url column and sync with source_url if table already exists
+        print("Adding url column to documents table if needed...")
+        try:
+            cursor.execute("ALTER TABLE documents ADD COLUMN IF NOT EXISTS url TEXT")
+            cursor.execute("UPDATE documents SET url = source_url WHERE url IS NULL")
+        except Exception as e:
+            print(f"documents.url may already exist: {e}")
         
         # ============================================
         # TABLE 2: CHUNKS
@@ -89,6 +98,9 @@ def setup_database():
                 user_name VARCHAR(255),
                 name_asked BOOLEAN DEFAULT FALSE,
                 lead_capture_completeness INTEGER DEFAULT 0,
+                lead_id INTEGER,
+                nationality VARCHAR(100),
+                lead_data JSONB,
                 ip_address VARCHAR(45),
                 user_agent TEXT
             );
@@ -100,7 +112,10 @@ def setup_database():
             "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS detected_location VARCHAR(100)",
             "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS user_name VARCHAR(255)",
             "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS name_asked BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS lead_capture_completeness INTEGER DEFAULT 0"
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS lead_capture_completeness INTEGER DEFAULT 0",
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS lead_id INTEGER",
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS nationality VARCHAR(100)",
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS lead_data JSONB"
         ]
         for stmt in alter_statements:
             try:
