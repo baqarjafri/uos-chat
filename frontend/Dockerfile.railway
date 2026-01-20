@@ -2,20 +2,19 @@
 # RAILWAY.APP DEPLOYMENT DOCKERFILE
 # Production-optimized build for Railway deployment
 # Uses multi-stage build with Nginx for serving
-# Build context: Project root directory
 # ============================================
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files from frontend directory
-COPY frontend/package.json frontend/package-lock.json ./
+# Copy package files
+COPY package.json package-lock.json ./
 
 # Install ALL dependencies (including devDependencies needed for build)
 RUN npm ci
 
-# Copy source code from frontend directory
-COPY frontend/ .
+# Copy source code
+COPY . .
 
 # Build the application
 RUN npm run build
@@ -26,7 +25,7 @@ FROM nginx:alpine
 # Copy built files to nginx
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx configuration from builder stage
+# Copy nginx configuration
 COPY --from=builder /app/nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 80
