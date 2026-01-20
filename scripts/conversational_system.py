@@ -587,6 +587,11 @@ class RAGAgent:
         Returns:
             Updated state with answer
         """
+        print(f"[RAG_AGENT] Processing query: {state.get('user_input', '')[:50]}...")
+        print(f"[RAG_AGENT] conversation_history length: {len(state.get('conversation_history', []))}")
+        print(f"[RAG_AGENT] detected_programs: {state.get('detected_programs', [])}")
+        print(f"[RAG_AGENT] student_type: {state.get('student_type')}")
+        
         # Handle greeting separately (only for first message)
         if state.get("intent") == "greeting" and len(state.get("conversation_history", [])) == 0:
             greeting_response = self._generate_greeting(state)
@@ -616,8 +621,10 @@ What brings you to Stirling today? Are you looking at:
         # Build enhanced query by combining current input with full conversation context
         # This ensures follow-up questions include program names, student type, and topics
         enhanced_query = self._build_enhanced_query(state)
+        print(f"[RAG_AGENT] Enhanced query: {enhanced_query[:100]}...")
         
         # Query RAG system with enhanced query for better context retrieval
+        print(f"[RAG_AGENT] Calling RAG system...")
         rag_response = self.rag.query(
             query=enhanced_query,
             student_type=state.get("student_type"),
@@ -625,6 +632,7 @@ What brings you to Stirling today? Are you looking at:
             detected_programs=state.get("detected_programs", []),
             conversation_history=state.get("conversation_history", [])
         )
+        print(f"[RAG_AGENT] RAG response received - answer length: {len(rag_response.answer)}")
         
         return {
             **state,
@@ -1291,20 +1299,30 @@ class ConversationalRAGSystem:
         Returns:
             Response dictionary
         """
+        print(f"\n{'='*60}")
+        print(f"[CHAT] New request - session_id: {session_id}")
+        print(f"[CHAT] User input: {user_input[:100]}...")
+        
         # Create or retrieve session
         if not session_id:
             session_id = str(uuid.uuid4())
+            print(f"[CHAT] Generated new session_id: {session_id}")
         
         if session_id not in self.sessions:
+            print(f"[CHAT] Session NOT in memory, checking database...")
             # FIRST: Try to restore session from database (persistence across restarts)
             db_session = self.conversation_manager.get_session_from_db(session_id)
             
             if db_session:
                 # Session found in DB - restore it to memory
+                print(f"[CHAT] Session RESTORED from DB - conversation_id: {db_session.get('conversation_id')}")
+                print(f"[CHAT] Restored messages count: {len(db_session.get('messages', []))}")
                 self.sessions[session_id] = db_session
             else:
                 # New session - create fresh conversation in DB
+                print(f"[CHAT] Creating NEW session in database...")
                 conversation_id = self.conversation_manager.create_conversation(session_id)
+                print(f"[CHAT] Created conversation_id: {conversation_id}")
                 self.sessions[session_id] = {
                     "conversation_id": conversation_id,
                     "messages": [],
@@ -1322,8 +1340,15 @@ class ConversationalRAGSystem:
                     "lead_capture_cooldown_until": 0,
                     "in_lead_capture_flow": False
                 }
+        else:
+            print(f"[CHAT] Session FOUND in memory")
         
         session = self.sessions[session_id]
+        print(f"[CHAT] Current session state:")
+        print(f"  - conversation_id: {session.get('conversation_id')}")
+        print(f"  - messages count: {len(session.get('messages', []))}")
+        print(f"  - detected_programs: {session.get('detected_programs', [])}")
+        print(f"  - student_type: {session.get('student_type')}")
         
         # Build initial state
         initial_state = ConversationState(
@@ -1366,19 +1391,33 @@ class ConversationalRAGSystem:
         )
         
         # Run through graph
-        final_state = self.graph.invoke(initial_state)
+        print(f"[CHAT] Running graph with conversation_history length: {len(initial_state['conversation_history'])}")
+        try:
+            final_state = self.graph.invoke(initial_state)
+            print(f"[CHAT] Graph completed - answer length: {len(final_state.get('answer', ''))}")
+        except Exception as e:
+            print(f"[CHAT] ERROR in graph.invoke: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
         
         # Calculate processing time
         processing_time = (datetime.now() - initial_state["processing_start_time"]).total_seconds() * 1000
         
         # Save messages
-        self.conversation_manager.save_message(
-            conversation_id=session["conversation_id"],
-            role="user",
-            content=user_input,
-            intent=final_state.get("intent"),
-            confidence=final_state.get("confidence")
-        )
+        print(f"[CHAT] Saving user message to DB...")
+        try:
+            self.conversation_manager.save_message(
+                conversation_id=session["conversation_id"],
+                role="user",
+                content=user_input,
+                intent=final_state.get("intent"),
+                confidence=final_state.get("confidence")
+            )
+            print(f"[CHAT] User message saved successfully")
+        except Exception as e:
+            print(f"[CHAT] ERROR saving user message: {e}")
+            self.conn.rollback()
         
         # Extract URLs from sources (sources can be list of dicts or list of strings)
         raw_sources = final_state.get("sources", [])
@@ -1389,13 +1428,19 @@ class ConversationalRAGSystem:
             elif isinstance(src, str):
                 source_urls.append(src)
         
-        self.conversation_manager.save_message(
-            conversation_id=session["conversation_id"],
-            role="assistant",
-            content=final_state["answer"],
-            sources=source_urls,
-            processing_time_ms=int(processing_time)
-        )
+        print(f"[CHAT] Saving assistant message to DB...")
+        try:
+            self.conversation_manager.save_message(
+                conversation_id=session["conversation_id"],
+                role="assistant",
+                content=final_state["answer"],
+                sources=source_urls,
+                processing_time_ms=int(processing_time)
+            )
+            print(f"[CHAT] Assistant message saved successfully")
+        except Exception as e:
+            print(f"[CHAT] ERROR saving assistant message: {e}")
+            self.conn.rollback()
         
         # Update session
         session["messages"].append({"role": "user", "content": user_input})
@@ -1414,14 +1459,25 @@ class ConversationalRAGSystem:
         session["lead_capture_cooldown_until"] = final_state.get("lead_capture_cooldown_until", session.get("lead_capture_cooldown_until", 0))
         session["in_lead_capture_flow"] = final_state.get("in_lead_capture_flow", session.get("in_lead_capture_flow", False))
         
+        print(f"[CHAT] Session updated - messages count now: {len(session['messages'])}")
+        print(f"[CHAT] Session updated - detected_programs: {session['detected_programs']}")
+        
         # Update conversation profile
-        self.conversation_manager.update_conversation_profile(
-            conversation_id=session["conversation_id"],
-            student_type=session["student_type"],
-            student_level=session["student_level"],
-            detected_location=session["detected_location"],
-            programs_discussed=session["detected_programs"]
-        )
+        try:
+            self.conversation_manager.update_conversation_profile(
+                conversation_id=session["conversation_id"],
+                student_type=session["student_type"],
+                student_level=session["student_level"],
+                detected_location=session["detected_location"],
+                programs_discussed=session["detected_programs"]
+            )
+            print(f"[CHAT] Conversation profile updated in DB")
+        except Exception as e:
+            print(f"[CHAT] ERROR updating conversation profile: {e}")
+            self.conn.rollback()
+        
+        print(f"[CHAT] Request completed successfully")
+        print(f"{'='*60}\n")
         
         # Return response
         return {

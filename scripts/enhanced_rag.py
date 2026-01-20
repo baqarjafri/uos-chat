@@ -1342,13 +1342,19 @@ class EnhancedRAG:
         Returns:
             RAGResponse with answer and metadata
         """
+        print(f"[ENHANCED_RAG] Query: {query[:80]}...")
+        print(f"[ENHANCED_RAG] conversation_history length: {len(conversation_history) if conversation_history else 0}")
+        print(f"[ENHANCED_RAG] detected_programs: {detected_programs}")
+        
         # 1. Hybrid search
+        print(f"[ENHANCED_RAG] Running hybrid search...")
         search_results = self.hybrid_search.search(
             query=query,
             student_type=student_type,
             student_level=student_level,
             conversation_context=conversation_context
         )
+        print(f"[ENHANCED_RAG] Search returned {len(search_results)} results")
         
         # 2. Re-rank results
         reranked_results = ReRanker.rerank(
@@ -1357,8 +1363,10 @@ class EnhancedRAG:
             student_type=student_type,
             detected_programs=detected_programs
         )
+        print(f"[ENHANCED_RAG] Reranked to {len(reranked_results)} results")
         
         # 3. Generate answer with full conversation context
+        print(f"[ENHANCED_RAG] Generating answer with Claude...")
         response = self.answer_generator.generate(
             query=query,
             search_results=reranked_results,
@@ -1367,6 +1375,7 @@ class EnhancedRAG:
             conversation_history=conversation_history,
             detected_programs=detected_programs
         )
+        print(f"[ENHANCED_RAG] Answer generated - length: {len(response.answer)}")
         
         return response
 
