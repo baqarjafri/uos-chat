@@ -75,12 +75,30 @@ def setup_database():
                 total_messages INTEGER DEFAULT 0,
                 student_type VARCHAR(50),
                 student_level VARCHAR(50),
+                detected_location VARCHAR(100),
                 programs_discussed TEXT[],
                 lead_captured BOOLEAN DEFAULT FALSE,
+                user_name VARCHAR(255),
+                name_asked BOOLEAN DEFAULT FALSE,
+                lead_capture_completeness INTEGER DEFAULT 0,
                 ip_address VARCHAR(45),
                 user_agent TEXT
             );
         """)
+        
+        # Add missing columns if table already exists
+        print("Adding missing columns to conversations table if needed...")
+        alter_statements = [
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS detected_location VARCHAR(100)",
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS user_name VARCHAR(255)",
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS name_asked BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS lead_capture_completeness INTEGER DEFAULT 0"
+        ]
+        for stmt in alter_statements:
+            try:
+                cursor.execute(stmt)
+            except Exception as e:
+                print(f"Column may already exist: {e}")
         
         # ============================================
         # TABLE 4: MESSAGES
