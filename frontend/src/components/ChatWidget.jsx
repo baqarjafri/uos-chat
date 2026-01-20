@@ -158,7 +158,7 @@ export default function ChatWidget() {
     return processedText;
   };
 
-  const renderFormattedText = (text) => {
+  const renderFormattedText = (text, messageRole = 'assistant') => {
     if (!text) return text;
     
     // Pre-process: Fix malformed link patterns using unified function
@@ -168,6 +168,12 @@ export default function ChatWidget() {
     const elements = [];
     let lastIndex = 0;
     let match;
+    
+    // Determine link/email styling based on message role
+    const isUserMessage = messageRole === 'user';
+    const linkClass = isUserMessage 
+      ? "inline-flex items-center gap-1 text-white hover:text-green-100 underline decoration-white/60 underline-offset-2 font-medium transition-colors hover:decoration-white"
+      : "inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-medium transition-colors hover:decoration-green-600";
     
     // Create a combined regex to find patterns: bold, links, emails, and phone numbers
     // Email: word@word.word format
@@ -189,7 +195,7 @@ export default function ChatWidget() {
           <a 
             key={`email-${match.index}`}
             href={`mailto:${matchedText}`}
-            className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-medium transition-colors hover:decoration-green-600"
+            className={linkClass}
           >
             {matchedText}
           </a>
@@ -206,7 +212,7 @@ export default function ChatWidget() {
           <a 
             key={`phone-${match.index}`}
             href={`tel:${cleanPhone}`}
-            className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-medium transition-colors hover:decoration-green-600"
+            className={linkClass}
           >
             {matchedText}
           </a>
@@ -226,7 +232,7 @@ export default function ChatWidget() {
             href={linkMatch[2]}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-medium transition-colors hover:decoration-green-600"
+            className={linkClass}
           >
             {cleanLinkText}
             <svg className="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,13 +250,16 @@ export default function ChatWidget() {
           // Clean link text: remove any leading/trailing brackets from malformed LLM output
           const cleanBoldLinkText = innerLinkMatch[1].replace(/^\[+/, '').replace(/\]+$/, '');
           // It's a bold link - render as bold link
+          const boldLinkClass = isUserMessage
+            ? "inline-flex items-center gap-1 text-white hover:text-green-100 underline decoration-white/60 underline-offset-2 font-semibold transition-colors hover:decoration-white"
+            : "inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-semibold transition-colors hover:decoration-green-600";
           elements.push(
             <a 
               key={`bold-link-${match.index}`}
               href={innerLinkMatch[2]}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-green-600 hover:text-green-700 underline decoration-green-400/60 underline-offset-2 font-semibold transition-colors hover:decoration-green-600"
+              className={boldLinkClass}
             >
               {cleanBoldLinkText}
               <svg className="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -495,7 +504,7 @@ export default function ChatWidget() {
                             <span className={`font-bold mr-3 min-w-[24px] ${message.role === 'user' ? 'text-green-200' : 'text-green-600'}`}>
                               {numberedMatch[1]}.
                             </span>
-                            <span className="flex-1">{renderInlineBold(numberedMatch[2])}</span>
+                            <span className="flex-1">{renderInlineBold(numberedMatch[2], message.role)}</span>
                           </div>
                         );
                       }
@@ -506,7 +515,7 @@ export default function ChatWidget() {
                         return (
                           <div key={i} className="flex items-start my-1.5 ml-1">
                             <span className={`mr-3 text-lg leading-none ${message.role === 'user' ? 'text-green-200' : 'text-green-500'}`}>•</span>
-                            <span className="flex-1">{renderInlineBold(bulletMatch[1])}</span>
+                            <span className="flex-1">{renderInlineBold(bulletMatch[1], message.role)}</span>
                           </div>
                         );
                       }
@@ -514,7 +523,7 @@ export default function ChatWidget() {
                       // Regular text
                       return (
                         <p key={i} className={i > 0 ? 'mt-2' : ''}>
-                          {renderInlineBold(trimmedLine)}
+                          {renderInlineBold(trimmedLine, message.role)}
                         </p>
                       );
                     })}

@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     
     # Server
     HOST: str = "0.0.0.0"
-    PORT: int = int(os.environ.get("PORT", 8000))  # Railway sets PORT env var
+    PORT: int = int(os.environ.get("PORT", os.environ.get("API_PORT", "8001")))  # Railway sets PORT, local uses API_PORT
     DEBUG: bool = False
     
     # Railway specific settings
