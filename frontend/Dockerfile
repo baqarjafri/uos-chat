@@ -1,4 +1,8 @@
-# Frontend Dockerfile
+# ============================================
+# LOCAL DEVELOPMENT DOCKERFILE
+# For local Docker Compose development only
+# For Railway deployment, use Dockerfile.railway
+# ============================================
 FROM node:20-alpine
 
 WORKDIR /app

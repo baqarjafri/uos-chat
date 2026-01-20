@@ -1,29 +1,9 @@
-### Step 15: Create Railway Frontend Configuration
-
-**Why?** Tell Railway how to deploy the frontend.
-
-**What to do:**
-
-Create railway.toml for frontend:
-<tool_call>write_to_file
-<arg_key>CodeContent</arg_key>
-<arg_value># Railway.app Frontend Configuration
-[deploy]
-# Health check endpoint
-healthcheckPath = "/health"
-healthcheckTimeout = 10
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 10
-
 [build]
-# Use production Dockerfile
-builder = "nixpacks"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile.railway"
 
-[[services]]
-# Frontend service
-name = "stirling-chat-frontend"
-source = "."
-[services.config]
-# Environment variables
-[services.config.variables]
-VITE_API_BASE_URL = "https://your-backend-url.railway.app"  # Update after backend deployment
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

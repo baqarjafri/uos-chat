@@ -31,13 +31,12 @@ class Settings(BaseSettings):
     
     # Server
     HOST: str = "0.0.0.0"
-    PORT: int = 8000
+    PORT: int = int(os.environ.get("PORT", 8000))  # Railway sets PORT env var
     DEBUG: bool = False
     
     # Railway specific settings
     RAILWAY_ENVIRONMENT: str = ""
     RAILWAY_SERVICE_NAME: str = ""
-    PORT = int(os.environ.get("PORT", 8000))  # Railway sets PORT env var
     
     # Rate Limiting (optional)
     RATE_LIMIT_PER_MINUTE: int = 60
