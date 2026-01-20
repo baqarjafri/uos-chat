@@ -198,23 +198,44 @@ class HybridSearch:
         Returns:
             List of SearchResult objects
         """
+        print(f"[HYBRID_SEARCH] Starting search for: {query[:50]}...")
+        
+        # Check database has data
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM chunks")
+            chunk_count = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM documents")
+            doc_count = cursor.fetchone()[0]
+            print(f"[HYBRID_SEARCH] Database has {doc_count} documents, {chunk_count} chunks")
+        except Exception as e:
+            print(f"[HYBRID_SEARCH] ERROR checking database: {e}")
+            self.conn.rollback()
+        
         # 1. Expand query
         expanded_query = QueryExpander.expand(query, student_level)
+        print(f"[HYBRID_SEARCH] Expanded query: {expanded_query[:80]}...")
         
         # 2. Vector search
+        print(f"[HYBRID_SEARCH] Running vector search...")
         vector_results = self._vector_search(expanded_query)
+        print(f"[HYBRID_SEARCH] Vector search returned {len(vector_results)} results")
         
         # 3. Keyword search
+        print(f"[HYBRID_SEARCH] Running keyword search...")
         keyword_results = self._keyword_search(expanded_query)
+        print(f"[HYBRID_SEARCH] Keyword search returned {len(keyword_results)} results")
         
         # 4. Merge and deduplicate
         merged_results = self._merge_results(vector_results, keyword_results)
+        print(f"[HYBRID_SEARCH] Merged results: {len(merged_results)}")
         
         # 5. Filter by similarity threshold
         filtered_results = [
             r for r in merged_results 
             if r.similarity_score >= RAGConfig.SIMILARITY_THRESHOLD
         ]
+        print(f"[HYBRID_SEARCH] After threshold filter: {len(filtered_results)} results")
         
         return filtered_results
     
