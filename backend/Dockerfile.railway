@@ -30,8 +30,7 @@ COPY backend /app/backend/
 # Set working directory to backend
 WORKDIR /app/backend
 
-# Copy startup script and set permissions
-COPY backend/startup.sh /app/backend/startup.sh
+# Set permissions for startup script
 RUN chmod +x /app/backend/startup.sh
 
 # Create non-root user for security
