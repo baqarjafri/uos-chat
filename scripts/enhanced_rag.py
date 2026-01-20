@@ -263,7 +263,7 @@ class HybridSearch:
                     c.document_id,
                     c.content,
                     COALESCE(c.heading_context, '') as heading_context,
-                    COALESCE(d.url, d.source_url) as source_url,
+                    d.url as source_url,
                     d.title as source_title,
                     d.category,
                     1 - (c.embedding <=> %s::vector) as similarity_score
@@ -306,7 +306,7 @@ class HybridSearch:
                     c.document_id,
                     c.content,
                     COALESCE(c.heading_context, '') as heading_context,
-                    COALESCE(d.url, d.source_url) as source_url,
+                    d.url as source_url,
                     d.title as source_title,
                     d.category,
                     ts_rank(
