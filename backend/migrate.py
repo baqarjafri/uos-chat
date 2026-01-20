@@ -55,12 +55,20 @@ def setup_database():
                 chunk_index INTEGER NOT NULL,
                 total_chunks INTEGER NOT NULL,
                 content TEXT NOT NULL,
+                heading_context TEXT,
                 embedding vector(1536),
                 token_count INTEGER,
                 metadata JSONB,
                 created_at TIMESTAMP DEFAULT NOW()
             );
         """)
+        
+        # Add missing column to chunks table if it already exists
+        print("Adding missing columns to chunks table if needed...")
+        try:
+            cursor.execute("ALTER TABLE chunks ADD COLUMN IF NOT EXISTS heading_context TEXT")
+        except Exception as e:
+            print(f"chunks.heading_context may already exist: {e}")
         
         # ============================================
         # TABLE 3: CONVERSATIONS
