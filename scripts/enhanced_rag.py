@@ -231,81 +231,95 @@ class HybridSearch:
         # Get embedding for query
         query_embedding = self._get_embedding(query)
         
-        cursor = self.conn.cursor(cursor_factory=RealDictCursor)
-        
-        # Vector search with pgvector
-        cursor.execute("""
-            SELECT 
-                c.id as chunk_id,
-                c.document_id,
-                c.content,
-                c.heading_context,
-                d.url as source_url,
-                d.title as source_title,
-                d.category,
-                1 - (c.embedding <=> %s::vector) as similarity_score
-            FROM chunks c
-            JOIN documents d ON c.document_id = d.id
-            ORDER BY c.embedding <=> %s::vector
-            LIMIT %s
-        """, (query_embedding, query_embedding, RAGConfig.TOP_K_VECTOR))
-        
-        results = []
-        for row in cursor.fetchall():
-            results.append(SearchResult(
-                chunk_id=row['chunk_id'],
-                document_id=row['document_id'],
-                content=row['content'],
-                heading_context=row['heading_context'] or '',
-                source_url=row['source_url'],
-                source_title=row['source_title'] or '',
-                category=row['category'],
-                similarity_score=float(row['similarity_score'])
-            ))
-        
-        return results
+        try:
+            cursor = self.conn.cursor(cursor_factory=RealDictCursor)
+            
+            # Vector search with pgvector
+            # Use COALESCE to handle both url and source_url columns
+            cursor.execute("""
+                SELECT 
+                    c.id as chunk_id,
+                    c.document_id,
+                    c.content,
+                    COALESCE(c.heading_context, '') as heading_context,
+                    COALESCE(d.url, d.source_url) as source_url,
+                    d.title as source_title,
+                    d.category,
+                    1 - (c.embedding <=> %s::vector) as similarity_score
+                FROM chunks c
+                JOIN documents d ON c.document_id = d.id
+                ORDER BY c.embedding <=> %s::vector
+                LIMIT %s
+            """, (query_embedding, query_embedding, RAGConfig.TOP_K_VECTOR))
+            
+            results = []
+            for row in cursor.fetchall():
+                results.append(SearchResult(
+                    chunk_id=row['chunk_id'],
+                    document_id=row['document_id'],
+                    content=row['content'],
+                    heading_context=row['heading_context'] or '',
+                    source_url=row['source_url'],
+                    source_title=row['source_title'] or '',
+                    category=row['category'],
+                    similarity_score=float(row['similarity_score'])
+                ))
+            
+            return results
+        except Exception as e:
+            # Rollback on error to clear aborted transaction state
+            self.conn.rollback()
+            print(f"Vector search error: {e}")
+            return []
     
     def _keyword_search(self, query: str) -> List[SearchResult]:
         """Perform keyword-based full-text search"""
-        cursor = self.conn.cursor(cursor_factory=RealDictCursor)
-        
-        # PostgreSQL full-text search
-        cursor.execute("""
-            SELECT 
-                c.id as chunk_id,
-                c.document_id,
-                c.content,
-                c.heading_context,
-                d.url as source_url,
-                d.title as source_title,
-                d.category,
-                ts_rank(
-                    to_tsvector('english', c.content || ' ' || COALESCE(c.heading_context, '')),
-                    plainto_tsquery('english', %s)
-                ) as keyword_score
-            FROM chunks c
-            JOIN documents d ON c.document_id = d.id
-            WHERE to_tsvector('english', c.content || ' ' || COALESCE(c.heading_context, '')) 
-                @@ plainto_tsquery('english', %s)
-            ORDER BY keyword_score DESC
-            LIMIT %s
-        """, (query, query, RAGConfig.TOP_K_KEYWORD))
-        
-        results = []
-        for row in cursor.fetchall():
-            results.append(SearchResult(
-                chunk_id=row['chunk_id'],
-                document_id=row['document_id'],
-                content=row['content'],
-                heading_context=row['heading_context'] or '',
-                source_url=row['source_url'],
-                source_title=row['source_title'] or '',
-                category=row['category'],
-                similarity_score=0.0,  # No vector score for keyword results
-                keyword_score=float(row['keyword_score'])
-            ))
-        
-        return results
+        try:
+            cursor = self.conn.cursor(cursor_factory=RealDictCursor)
+            
+            # PostgreSQL full-text search
+            # Use COALESCE to handle both url and source_url columns
+            cursor.execute("""
+                SELECT 
+                    c.id as chunk_id,
+                    c.document_id,
+                    c.content,
+                    COALESCE(c.heading_context, '') as heading_context,
+                    COALESCE(d.url, d.source_url) as source_url,
+                    d.title as source_title,
+                    d.category,
+                    ts_rank(
+                        to_tsvector('english', c.content || ' ' || COALESCE(c.heading_context, '')),
+                        plainto_tsquery('english', %s)
+                    ) as keyword_score
+                FROM chunks c
+                JOIN documents d ON c.document_id = d.id
+                WHERE to_tsvector('english', c.content || ' ' || COALESCE(c.heading_context, '')) 
+                    @@ plainto_tsquery('english', %s)
+                ORDER BY keyword_score DESC
+                LIMIT %s
+            """, (query, query, RAGConfig.TOP_K_KEYWORD))
+            
+            results = []
+            for row in cursor.fetchall():
+                results.append(SearchResult(
+                    chunk_id=row['chunk_id'],
+                    document_id=row['document_id'],
+                    content=row['content'],
+                    heading_context=row['heading_context'] or '',
+                    source_url=row['source_url'],
+                    source_title=row['source_title'] or '',
+                    category=row['category'],
+                    similarity_score=0.0,  # No vector score for keyword results
+                    keyword_score=float(row['keyword_score'])
+                ))
+            
+            return results
+        except Exception as e:
+            # Rollback on error to clear aborted transaction state
+            self.conn.rollback()
+            print(f"Keyword search error: {e}")
+            return []
     
     def _merge_results(
         self,
