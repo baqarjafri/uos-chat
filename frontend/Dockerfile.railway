@@ -1,20 +1,25 @@
 # ============================================
-# RAILWAY.APP DEPLOYMENT DOCKERFILE
+# RAILWAY.APP FRONTEND DEPLOYMENT DOCKERFILE
 # Production-optimized build for Railway deployment
+# Build context: frontend/ directory (Root Directory = frontend)
 # Uses multi-stage build with Nginx for serving
 # ============================================
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files from current directory
 COPY package.json package-lock.json ./
 
 # Install ALL dependencies (including devDependencies needed for build)
 RUN npm ci
 
-# Copy source code
+# Copy source code from current directory
 COPY . .
+
+# Set build-time environment variable for Vite
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Build the application
 RUN npm run build
