@@ -50,8 +50,14 @@ Thumbs.db
 # Data files (crawled content, processed data)
 data/crawled/
 data/processed/
-*.json
+data/**/*.json
 *.jsonl
+
+# Allow package files
+!package.json
+!package-lock.json
+!**/package.json
+!**/package-lock.json
 
 # Keep directory structure but ignore contents
 !data/crawled/.gitkeep
