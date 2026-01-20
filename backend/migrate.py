@@ -34,24 +34,24 @@ def setup_database():
         print("Creating documents table...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS documents (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                source_url TEXT NOT NULL,
-                url TEXT,
-                category VARCHAR(50) NOT NULL,
-                title TEXT NOT NULL,
-                full_content TEXT NOT NULL,
-                crawled_at TIMESTAMP DEFAULT NOW(),
+                id SERIAL PRIMARY KEY,
+                url TEXT NOT NULL,
+                title TEXT,
+                description TEXT,
+                category TEXT,
+                markdown_content TEXT,
+                scraped_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW(),
+                content_length INTEGER,
+                estimated_chunks INTEGER,
+                status_code INTEGER,
+                language TEXT DEFAULT 'en',
                 metadata JSONB
             );
         """)
         
-        # Add url column and sync with source_url if table already exists
-        print("Adding url column to documents table if needed...")
-        try:
-            cursor.execute("ALTER TABLE documents ADD COLUMN IF NOT EXISTS url TEXT")
-            cursor.execute("UPDATE documents SET url = source_url WHERE url IS NULL")
-        except Exception as e:
-            print(f"documents.url may already exist: {e}")
+        # Skip source_url sync since local schema uses url directly
+        print("Documents table ready...")
         
         # ============================================
         # TABLE 2: CHUNKS
@@ -59,16 +59,16 @@ def setup_database():
         print("Creating chunks table with vector support...")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS chunks (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
-                chunk_index INTEGER NOT NULL,
-                total_chunks INTEGER NOT NULL,
+                id SERIAL PRIMARY KEY,
+                document_id INTEGER REFERENCES documents(id) ON DELETE CASCADE,
+                chunk_index INTEGER,
                 content TEXT NOT NULL,
-                heading_context TEXT,
-                embedding vector(1536),
                 token_count INTEGER,
-                metadata JSONB,
-                created_at TIMESTAMP DEFAULT NOW()
+                embedding vector(1536),
+                created_at TIMESTAMP DEFAULT NOW(),
+                heading_context TEXT,
+                total_chunks INTEGER,
+                metadata JSONB DEFAULT '{}'::jsonb
             );
         """)
         
@@ -335,7 +335,7 @@ def setup_database():
         # Document indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS chunks_document_id_idx ON chunks(document_id);")
         cursor.execute("CREATE INDEX IF NOT EXISTS documents_category_idx ON documents(category);")
-        cursor.execute("CREATE INDEX IF NOT EXISTS documents_url_idx ON documents(source_url);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS documents_url_idx ON documents(url);")
         
         # Conversation indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS conversations_session_id_idx ON conversations(session_id);")
