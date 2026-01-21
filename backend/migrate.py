@@ -157,12 +157,26 @@ def setup_database():
                 session_id VARCHAR(255) NOT NULL,
                 rating VARCHAR(20) NOT NULL,
                 suggestion TEXT,
+                has_suggestion BOOLEAN DEFAULT FALSE,
+                total_messages_in_conversation INTEGER,
+                conversation_duration_seconds INTEGER,
+                feedback_categories TEXT[] DEFAULT '{}',
                 submitted_at TIMESTAMP DEFAULT NOW(),
                 user_ip_address VARCHAR(45),
                 user_agent TEXT,
                 reviewed BOOLEAN DEFAULT FALSE
             );
         """)
+        
+        # Add missing columns to conversation_feedback if table already exists
+        print("Adding missing columns to conversation_feedback table if needed...")
+        try:
+            cursor.execute("ALTER TABLE conversation_feedback ADD COLUMN IF NOT EXISTS has_suggestion BOOLEAN DEFAULT FALSE")
+            cursor.execute("ALTER TABLE conversation_feedback ADD COLUMN IF NOT EXISTS total_messages_in_conversation INTEGER")
+            cursor.execute("ALTER TABLE conversation_feedback ADD COLUMN IF NOT EXISTS conversation_duration_seconds INTEGER")
+            cursor.execute("ALTER TABLE conversation_feedback ADD COLUMN IF NOT EXISTS feedback_categories TEXT[] DEFAULT '{}'")
+        except Exception as e:
+            print(f"conversation_feedback columns may already exist: {e}")
         
         # ============================================
         # TABLE 6: SAFETY_INCIDENTS
