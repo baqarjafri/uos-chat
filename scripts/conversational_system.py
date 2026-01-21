@@ -654,20 +654,25 @@ What brings you to Stirling today? Are you looking at:
         user_input = state.get("user_input", "")
         user_input_lower = user_input.lower()
         
+        print(f"[QUERY_BUILD] User input: '{user_input}'")
+        
         # Step 1: Check if user is asking about a NEW specific topic/program
         # If yes, search ONLY for that - don't add old context
         new_topic_detected = self._extract_new_topic(user_input_lower)
+        print(f"[QUERY_BUILD] New topic detected: {new_topic_detected}")
         if new_topic_detected:
             # User mentioned a specific new topic - search cleanly for it
+            print(f"[QUERY_BUILD] Using clean query (new topic): '{user_input}'")
             return user_input
         
         # Step 2: Check if this is a vague follow-up question
         vague_indicators = [
             'this program', 'this course', 'the program', 'the course',
-            'it', 'that', 'what about', 'how much', 'when is', 'tell me more',
+            'what about', 'how much', 'when is', 'tell me more',
             'what are the', 'how long', 'the fees', 'the requirements', 'the deadline'
         ]
         is_vague_followup = any(indicator in user_input_lower for indicator in vague_indicators)
+        print(f"[QUERY_BUILD] Is vague followup: {is_vague_followup}")
         
         # Step 3: For vague follow-ups, add ONLY the most recent program context
         if is_vague_followup:
