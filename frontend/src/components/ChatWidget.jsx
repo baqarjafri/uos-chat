@@ -4,7 +4,7 @@ import axios from 'axios'
 import { API_ENDPOINTS, CHAT_CONFIG } from '../config'
 import FeedbackModal from './FeedbackModal'
 
-export default function ChatWidget() {
+export default function ChatWidget({ onOpenChange }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -48,6 +48,13 @@ export default function ChatWidget() {
       inputRef.current.focus()
     }
   }, [isOpen, isMinimized])
+
+  // Notify parent when chat open state changes
+  useEffect(() => {
+    if (onOpenChange) {
+      onOpenChange(isOpen)
+    }
+  }, [isOpen, onOpenChange])
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return
