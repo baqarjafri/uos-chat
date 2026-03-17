@@ -3,7 +3,7 @@ import {
   Code, MessageSquare, GitBranch, Globe, Cpu, 
   ChevronRight, Sparkles, Layout, Lock, Search,
   Users, BarChart, Workflow, Layers, Network,
-  ArrowRight, ExternalLink, Github, Linkedin, Mail
+  ArrowRight, ExternalLink, Linkedin, Mail
 } from 'lucide-react'
 
 // Logo image - using the University logo as requested
@@ -119,9 +119,9 @@ export default function StirlingHomepage() {
             <div className="flex items-center gap-6">
               <span className="text-slate-500 text-sm hidden md:block">Built by</span>
               <div className="flex items-center gap-3">
-                <span className="font-semibold text-slate-800">Syed Baqar Jafri</span>
+                <span className="font-semibold text-slate-800">Baqar Jafri</span>
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white text-sm font-bold">
-                  SJ
+                  BJ
                 </div>
               </div>
             </div>
@@ -170,15 +170,6 @@ export default function StirlingHomepage() {
               Try the AI Chat
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
-            <a 
-              href="https://github.com/baqarjafri/uos-chat" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-4 bg-white text-slate-700 font-semibold rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-300"
-            >
-              <Github className="w-5 h-5" />
-              View on GitHub
-            </a>
           </div>
           
           {/* Key Stats */}
@@ -376,16 +367,7 @@ export default function StirlingHomepage() {
           
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a 
-              href="https://github.com/baqarjafri" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
-            >
-              <Github className="w-5 h-5" />
-              <span className="font-medium">GitHub</span>
-            </a>
-            <a 
-              href="https://linkedin.com/in/syed-baqar-jafri" 
+              href="https://www.linkedin.com/in/thebaqarjafri/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
