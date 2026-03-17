@@ -1,302 +1,445 @@
-import { Search, Menu, ChevronRight, Facebook, Instagram, Youtube, Linkedin, GraduationCap } from 'lucide-react'
+import { 
+  Bot, Brain, Database, Shield, Zap, Server, 
+  Code, MessageSquare, GitBranch, Globe, Cpu, 
+  ChevronRight, Sparkles, Layout, Lock, Search,
+  Users, BarChart, Workflow, Layers, Network,
+  ArrowRight, ExternalLink, Github, Linkedin, Mail
+} from 'lucide-react'
 
-// Local images - stored in public/images folder
+// Logo image - using the University logo as requested
 const IMAGES = {
   logo: '/images/stirling-logo.svg',
-  hero: '/images/hero-campus.jpg',
-  undergraduate: '/images/undergraduate.jpg',
-  postgraduate: '/images/postgraduate.jpg',
-  research: '/images/research.jpg',
-  strategic: '/images/strategic.jpg',
-  sport: '/images/sport.jpg',
-};
+}
+
+// Key project metrics
+const STATS = [
+  { value: '1,206', label: 'University Pages Scraped', icon: Globe },
+  { value: '15,000+', label: 'Text Chunks Processed', icon: Layers },
+  { value: '1,536', label: 'Vector Dimensions', icon: Network },
+  { value: '3', label: 'AI Agents Orchestrated', icon: Workflow },
+]
+
+// Tech stack categories
+const TECH_STACK = [
+  {
+    category: 'AI & ML',
+    icon: Brain,
+    items: [
+      { name: 'Claude 3 Haiku', desc: 'Anthropic LLM for conversational AI' },
+      { name: 'OpenAI Embeddings', desc: 'text-embedding-3-small (1,536D)' },
+      { name: 'LangGraph', desc: '3-agent state machine orchestration' },
+    ]
+  },
+  {
+    category: 'Search & RAG',
+    icon: Search,
+    items: [
+      { name: 'Hybrid RAG', desc: 'Vector similarity + BM25 keyword search' },
+      { name: 'Re-ranking', desc: 'Cross-encoder relevance scoring' },
+      { name: 'pgvector', desc: 'PostgreSQL vector similarity search' },
+    ]
+  },
+  {
+    category: 'Safety & Guardrails',
+    icon: Shield,
+    items: [
+      { name: 'Topic Boundaries', desc: 'University-focused scope enforcement' },
+      { name: 'Prompt Injection Guard', desc: 'Multi-layer security filters' },
+      { name: 'Safety Monitoring', desc: 'Incident logging & rate limiting' },
+    ]
+  },
+  {
+    category: 'Backend & API',
+    icon: Server,
+    items: [
+      { name: 'FastAPI', desc: 'High-performance Python REST API' },
+      { name: 'PostgreSQL', desc: '13 tables, 30+ optimized indexes' },
+      { name: '7 Endpoints', desc: 'Chat, feedback, health & analytics' },
+    ]
+  },
+  {
+    category: 'Frontend & UI',
+    icon: Layout,
+    items: [
+      { name: 'React 18', desc: 'Modern component-based architecture' },
+      { name: 'TailwindCSS', desc: 'Utility-first responsive styling' },
+      { name: 'Vite Build', desc: 'Lightning-fast development & build' },
+    ]
+  },
+  {
+    category: 'Data Pipeline',
+    icon: GitBranch,
+    items: [
+      { name: 'FireCrawl', desc: 'JS-rendered web scraping engine' },
+      { name: 'Smart Chunking', desc: 'Semantic text segmentation' },
+      { name: 'Lead Capture', desc: 'Progressive data collection system' },
+    ]
+  },
+]
+
+// Architecture flow steps
+const ARCHITECTURE_STEPS = [
+  {
+    title: 'Router Agent',
+    desc: 'Intent classification & query routing',
+    icon: Bot,
+    color: 'from-blue-500 to-blue-600'
+  },
+  {
+    title: 'RAG Agent',
+    desc: 'Hybrid retrieval & context synthesis',
+    icon: Database,
+    color: 'from-emerald-500 to-emerald-600'
+  },
+  {
+    title: 'Lead Agent',
+    desc: 'Progressive data capture & tracking',
+    icon: Users,
+    color: 'from-purple-500 to-purple-600'
+  },
+]
 
 export default function StirlingHomepage() {
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: "'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
-      {/* Top Utility Bar */}
-      <div className="bg-[#f5f5f5] border-b border-gray-200">
-        <div className="max-w-[1400px] mx-auto px-4 py-2">
-          <div className="flex justify-between items-center text-[13px]">
-            <div className="flex space-x-6">
-              <a href="https://www.stir.ac.uk/internal-staff/" className="text-[#333] hover:text-[#006938] transition">Staff</a>
-              <a href="https://www.stir.ac.uk/internal-students/" className="text-[#333] hover:text-[#006938] transition">Students</a>
-              <a href="https://www.stir.ac.uk/about/our-people/alumni/" className="text-[#333] hover:text-[#006938] transition">Alumni</a>
-            </div>
-            <div className="flex items-center space-x-4">
-              <a href="https://portal.stir.ac.uk/student/enquiry/ask.jsp" className="text-[#333] hover:text-[#006938] transition">Contact</a>
-              <button className="text-[#333] hover:text-[#006938] p-1">
-                <Search className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-[1400px] mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100" style={{ fontFamily: "'Inter', 'Open Sans', system-ui, sans-serif" }}>
+      
+      {/* Navigation Bar */}
+      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <a href="https://www.stir.ac.uk/" className="flex items-center">
+            <a href="https://www.stir.ac.uk/" className="flex items-center gap-3 group">
               <img 
                 src={IMAGES.logo}
                 alt="University of Stirling" 
-                className="h-[45px] md:h-[55px]"
+                className="h-10 md:h-12 transition-transform group-hover:scale-105"
               />
+              <span className="text-slate-600 text-sm font-medium hidden sm:block">Research Project</span>
             </a>
             
-            <nav className="hidden lg:flex items-center space-x-1">
-              <a href="https://www.stir.ac.uk/study/" className="text-[#333] hover:text-[#006938] transition px-4 py-2 text-[15px] font-medium">Study</a>
-              <a href="https://www.stir.ac.uk/research/" className="text-[#333] hover:text-[#006938] transition px-4 py-2 text-[15px] font-medium">Research</a>
-              <a href="https://www.stir.ac.uk/about/" className="text-[#333] hover:text-[#006938] transition px-4 py-2 text-[15px] font-medium">About</a>
-              <a href="https://www.stir.ac.uk/study/international-students/" className="text-[#333] hover:text-[#006938] transition px-4 py-2 text-[15px] font-medium">International</a>
-              <a href="https://www.stir.ac.uk/about/faculties/stirling-management-school/business-engagement/" className="text-[#333] hover:text-[#006938] transition px-4 py-2 text-[15px] font-medium">Business</a>
-              <a href="https://www.stir.ac.uk/study/apply/" className="bg-[#006938] text-white px-6 py-2.5 rounded hover:bg-[#005530] transition font-semibold text-[15px] ml-4">
-                Apply
-              </a>
-            </nav>
-            
-            <button className="lg:hidden p-2">
-              <Menu className="w-6 h-6 text-[#333]" />
-            </button>
+            <div className="flex items-center gap-6">
+              <span className="text-slate-500 text-sm hidden md:block">Built by</span>
+              <div className="flex items-center gap-3">
+                <span className="font-semibold text-slate-800">Syed Baqar Jafri</span>
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white text-sm font-bold">
+                  SJ
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </header>
+      </nav>
 
       {/* Hero Section */}
-      <section className="relative h-[500px] md:h-[600px] bg-cover bg-center" style={{
-        backgroundImage: `linear-gradient(rgba(0, 32, 91, 0.6), rgba(0, 32, 91, 0.6)), url("${IMAGES.hero}")`,
-        backgroundPosition: 'center center',
-        backgroundSize: 'cover'
-      }}>
-        <div className="max-w-[1400px] mx-auto px-4 h-full flex items-center">
-          <div className="max-w-2xl text-white">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Study in Scotland, UK
-            </h1>
-            <p className="text-lg md:text-xl mb-8 leading-relaxed opacity-95">
-              The University of Stirling is a world-class institution with one of the best student experiences in the UK. Are you Stirling?
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <a href="https://www.stir.ac.uk/study/" className="bg-[#006938] text-white px-8 py-3 rounded hover:bg-[#005530] transition font-semibold text-base inline-block">
-                Explore courses
-              </a>
-              <a href="https://www.stir.ac.uk/study/visit-us/" className="border-2 border-white text-white px-8 py-3 rounded hover:bg-white hover:text-[#00205B] transition font-semibold text-base inline-block">
-                Visit us
-              </a>
+      <section className="relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        </div>
+        
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
+          {/* Badge */}
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-200/60">
+              <Sparkles className="w-4 h-4 text-emerald-600" />
+              <span className="text-sm font-medium text-emerald-800">AI-Powered Research Project</span>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Study at Stirling - Course Cards */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-[1400px] mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#00205B] mb-10 text-center">
-            Study at Stirling - choose your course
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {/* Undergraduate */}
-            <a href="https://www.stir.ac.uk/study/undergraduate/" className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-shadow group block">
-              <div className="h-48 bg-cover bg-center" style={{
-                backgroundImage: `url("${IMAGES.undergraduate}")`
-              }}></div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-[#00205B] group-hover:text-[#006938] transition">Undergraduate</h3>
-                <p className="text-gray-600 mb-4 text-[15px]">
-                  More than 170 flexible undergraduate degree courses.
-                </p>
-                <span className="text-[#006938] font-semibold inline-flex items-center text-[15px]">
-                  Undergraduate <ChevronRight className="w-4 h-4 ml-1" />
-                </span>
-              </div>
-            </a>
-
-            {/* Postgraduate taught */}
-            <a href="https://www.stir.ac.uk/study/postgraduate/" className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-shadow group block">
-              <div className="h-48 bg-cover bg-center" style={{
-                backgroundImage: `url("${IMAGES.postgraduate}")`
-              }}></div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-[#00205B] group-hover:text-[#006938] transition">Postgraduate taught</h3>
-                <p className="text-gray-600 mb-4 text-[15px]">
-                  On campus and online Masters courses with multiple start dates.
-                </p>
-                <span className="text-[#006938] font-semibold inline-flex items-center text-[15px]">
-                  Postgraduate taught <ChevronRight className="w-4 h-4 ml-1" />
-                </span>
-              </div>
-            </a>
-
-            {/* Research degrees */}
-            <a href="https://www.stir.ac.uk/research/research-degrees/" className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-shadow group block">
-              <div className="h-48 bg-cover bg-center" style={{
-                backgroundImage: `url("${IMAGES.research}")`
-              }}></div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-[#00205B] group-hover:text-[#006938] transition">Research degrees</h3>
-                <p className="text-gray-600 mb-4 text-[15px]">
-                  Find out about our PhD, MPhil and Professional Doctorates.
-                </p>
-                <span className="text-[#006938] font-semibold inline-flex items-center text-[15px]">
-                  Research degrees <ChevronRight className="w-4 h-4 ml-1" />
-                </span>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Winter Break Notice */}
-      <section className="py-12 bg-[#f5f5f5]">
-        <div className="max-w-[1400px] mx-auto px-4">
-          <div className="bg-white rounded-lg shadow-md p-8 flex flex-col md:flex-row items-center gap-6">
-            <div className="flex-1">
-              <h2 className="text-2xl md:text-3xl font-bold text-[#00205B] mb-4">
-                Campus services and student support over the Winter Break
-              </h2>
-              <p className="text-gray-600 mb-4 text-[15px] leading-relaxed">
-                The University Winter Break runs from 17:00 (GMT) Tuesday 23 December 2025 to 09:00 (GMT) Monday 5 January 2026. Some campus services may be closed or will operate different opening hours.
-              </p>
-              <a href="https://www.stir.ac.uk/about/christmas-closure-information/" className="text-[#006938] font-semibold inline-flex items-center text-[15px] hover:underline">
-                See the availability of University services and their opening hours <ChevronRight className="w-4 h-4 ml-1" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Cards - Strategic Plan & Sport */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-[1400px] mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Strategic Plan 2030 */}
-            <a href="https://www.stir.ac.uk/about/strategic-plan/" className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow group block">
-              <div className="h-56 md:h-64 bg-cover bg-center" style={{
-                backgroundImage: `url("${IMAGES.strategic}")`
-              }}></div>
-              <div className="p-8">
-                <h3 className="text-2xl md:text-3xl font-bold text-[#00205B] mb-4 group-hover:text-[#006938] transition">
-                  Strategic Plan 2030
-                </h3>
-                <p className="text-gray-600 mb-6 leading-relaxed text-[15px]">
-                  Our Strategic Plan sets out the University's direction to 2030. We are confident it will enable us to deliver our ambition to be the difference, to make an impact on people's lives and be a force for good in the world.
-                </p>
-                <span className="text-[#006938] font-semibold inline-flex items-center text-[15px]">
-                  Strategic Plan <ChevronRight className="w-4 h-4 ml-1" />
-                </span>
-              </div>
-            </a>
-
-            {/* Scotland's University for Sporting Excellence */}
-            <a href="https://www.stir.ac.uk/student-life/sport-at-stirling/" className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow group block">
-              <div className="h-56 md:h-64 bg-cover bg-center" style={{
-                backgroundImage: `url("${IMAGES.sport}")`
-              }}></div>
-              <div className="p-8">
-                <h3 className="text-2xl md:text-3xl font-bold text-[#00205B] mb-4 group-hover:text-[#006938] transition">
-                  Scotland's University for Sporting Excellence
-                </h3>
-                <p className="text-gray-600 mb-6 leading-relaxed text-[15px]">
-                  We deliver the best for Scottish sport through the powerful combination of sport and education.
-                </p>
-                <span className="text-[#006938] font-semibold inline-flex items-center text-[15px]">
-                  Sport at Stirling <ChevronRight className="w-4 h-4 ml-1" />
-                </span>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Research Banner */}
-      <section className="py-16 md:py-20 bg-[#00205B] text-white">
-        <div className="max-w-[1400px] mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Research
-          </h2>
-          <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto leading-relaxed opacity-90">
-            Our research makes the difference. Explore our research themes, programmes and spotlight articles to find out how we're impacting the world.
+          
+          {/* Main Title */}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-center text-slate-900 mb-6 leading-tight">
+            Stirling University
+            <span className="block bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
+              AI Chat Assistant
+            </span>
+          </h1>
+          
+          {/* Subtitle */}
+          <p className="text-lg sm:text-xl text-center text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed">
+            An enterprise-grade conversational AI system built with Retrieval-Augmented Generation (RAG), 
+            multi-agent orchestration, and advanced safety guardrails for prospective student engagement.
           </p>
-          <a href="https://www.stir.ac.uk/research/" className="bg-[#006938] text-white px-8 py-3 rounded hover:bg-[#005530] transition font-semibold text-base inline-block">
-            Explore our research
-          </a>
+          
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('openChatWidget'))}
+              className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300"
+            >
+              <MessageSquare className="w-5 h-5" />
+              Try the AI Chat
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <a 
+              href="https://github.com/baqarjafri/uos-chat" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-4 bg-white text-slate-700 font-semibold rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-300"
+            >
+              <Github className="w-5 h-5" />
+              View on GitHub
+            </a>
+          </div>
+          
+          {/* Key Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {STATS.map((stat, idx) => (
+              <div 
+                key={idx} 
+                className="bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/60 hover:border-emerald-300/60 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500/10 to-blue-500/10">
+                    <stat.icon className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <span className="text-2xl sm:text-3xl font-bold text-slate-900">{stat.value}</span>
+                </div>
+                <p className="text-sm text-slate-600">{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[#1a1a1a] text-white">
-        {/* Social Links */}
-        <div className="border-b border-gray-700">
-          <div className="max-w-[1400px] mx-auto px-4 py-6">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <span className="text-[15px] font-medium">Follow us</span>
-              <div className="flex items-center space-x-4">
-                <a href="https://www.facebook.com/universityofstirling/" className="text-gray-400 hover:text-white transition p-2" aria-label="Facebook">
-                  <Facebook className="w-5 h-5" />
-                </a>
-                <a href="https://www.instagram.com/universityofstirling/" className="text-gray-400 hover:text-white transition p-2" aria-label="Instagram">
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a href="https://x.com/StirUni" className="text-gray-400 hover:text-white transition p-2" aria-label="X/Twitter">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                </a>
-                <a href="https://www.youtube.com/user/UniversityOfStirling" className="text-gray-400 hover:text-white transition p-2" aria-label="YouTube">
-                  <Youtube className="w-5 h-5" />
-                </a>
-                <a href="https://www.linkedin.com/school/university-of-stirling/" className="text-gray-400 hover:text-white transition p-2" aria-label="LinkedIn">
-                  <Linkedin className="w-5 h-5" />
-                </a>
-                <a href="https://www.tiktok.com/@universityofstirling/" className="text-gray-400 hover:text-white transition p-2" aria-label="TikTok">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>
-                </a>
+      {/* Architecture Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <Workflow className="w-5 h-5 text-emerald-600" />
+              <span className="text-sm font-semibold text-emerald-600 uppercase tracking-wide">System Architecture</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              3-Agent LangGraph Orchestration
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              A sophisticated state machine that routes queries through specialized AI agents, 
+              each optimized for different stages of the conversation pipeline.
+            </p>
+          </div>
+          
+          {/* Architecture Flow */}
+          <div className="relative">
+            {/* Connection Lines (Desktop) */}
+            <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-200 via-emerald-200 to-purple-200 -translate-y-1/2" />
+            
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8 relative z-10">
+              {ARCHITECTURE_STEPS.map((step, idx) => (
+                <div 
+                  key={idx}
+                  className="group bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border border-slate-200 hover:border-emerald-300/60 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300"
+                >
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center text-white shadow-lg mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    <step.icon className="w-7 h-7" />
+                  </div>
+                  <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold text-sm mb-3">
+                    {idx + 1}
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
+                  <p className="text-slate-600">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Architecture Diagram Text */}
+          <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-200">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-sm font-medium text-slate-700">
+              <span className="px-3 py-1.5 bg-white rounded-lg border border-slate-200">React Frontend</span>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <span className="px-3 py-1.5 bg-white rounded-lg border border-slate-200">FastAPI Backend</span>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <span className="px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-200 text-blue-700">Router Agent</span>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <span className="px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-700">RAG Agent</span>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <span className="px-3 py-1.5 bg-purple-50 rounded-lg border border-purple-200 text-purple-700">Lead Capture</span>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <span className="px-3 py-1.5 bg-slate-700 text-white rounded-lg">PostgreSQL + pgvector</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tech Stack Grid */}
+      <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <Cpu className="w-5 h-5 text-emerald-600" />
+              <span className="text-sm font-semibold text-emerald-600 uppercase tracking-wide">Technology Stack</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              Enterprise-Grade Technology
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Built with production-ready technologies chosen for performance, scalability, and reliability.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {TECH_STACK.map((category, idx) => (
+              <div 
+                key={idx}
+                className="group bg-white rounded-2xl p-6 border border-slate-200 hover:border-emerald-300/60 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300"
+              >
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/10 to-blue-500/10 group-hover:from-emerald-500/20 group-hover:to-blue-500/20 transition-colors">
+                    <category.icon className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900">{category.category}</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {category.items.map((item, itemIdx) => (
+                    <div key={itemIdx} className="border-l-2 border-slate-200 pl-4 hover:border-emerald-400 transition-colors">
+                      <p className="font-semibold text-slate-800 text-sm">{item.name}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* Popular Links */}
-        <div className="border-b border-gray-700">
-          <div className="max-w-[1400px] mx-auto px-4 py-8">
-            <h4 className="text-[15px] font-semibold mb-4">Popular links</h4>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              <a href="https://www.stir.ac.uk/about/faculties/" className="text-gray-400 hover:text-white text-[14px] transition">Faculties</a>
-              <a href="https://www.stir.ac.uk/about/professional-services/" className="text-gray-400 hover:text-white text-[14px] transition">Professional services</a>
-              <a href="https://www.stir.ac.uk/about/our-people/alumni/" className="text-gray-400 hover:text-white text-[14px] transition">Alumni</a>
-              <a href="https://www.stir.ac.uk/about/work-at-stirling/" className="text-gray-400 hover:text-white text-[14px] transition">Jobs at Stirling</a>
-              <a href="https://www.stir.ac.uk/about/getting-here/" className="text-gray-400 hover:text-white text-[14px] transition">Getting here</a>
-              <a href="https://www.stir.ac.uk/student-life/students-union/" className="text-gray-400 hover:text-white text-[14px] transition">Students' Union</a>
-              <a href="https://shop.stir.ac.uk/" className="text-gray-400 hover:text-white text-[14px] transition">Online shop</a>
-              <a href="https://blog.stir.ac.uk/" className="text-gray-400 hover:text-white text-[14px] transition">Blog</a>
-              <a href="https://www.stir.ac.uk/internal-students/" className="text-gray-400 hover:text-white text-[14px] transition">Current students</a>
-              <a href="https://www.stir.ac.uk/internal-staff/" className="text-gray-400 hover:text-white text-[14px] transition">Staff</a>
+      {/* Key Features / Expertise Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <Zap className="w-5 h-5 text-emerald-600" />
+              <span className="text-sm font-semibold text-emerald-600 uppercase tracking-wide">Core Capabilities</span>
             </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              Advanced AI Implementation
+            </h2>
+          </div>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: Database,
+                title: 'Hybrid RAG System',
+                desc: 'Combines vector similarity search with BM25 keyword matching for superior retrieval accuracy'
+              },
+              {
+                icon: Shield,
+                title: 'Multi-Layer Safety',
+                desc: 'Topic boundaries, prompt injection detection, and comprehensive guardrail system'
+              },
+              {
+                icon: Users,
+                title: 'Progressive Lead Capture',
+                desc: 'Intelligent data collection that tracks user journey and optimizes conversion'
+              },
+              {
+                icon: BarChart,
+                title: 'Feedback Analytics',
+                desc: '3-level rating system with sentiment analysis and improvement tracking'
+              },
+            ].map((feature, idx) => (
+              <div 
+                key={idx}
+                className="group p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:bg-white hover:border-emerald-300/60 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300"
+              >
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                  <feature.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{feature.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* Site Information */}
-        <div className="border-b border-gray-700">
-          <div className="max-w-[1400px] mx-auto px-4 py-6">
-            <h4 className="text-[15px] font-semibold mb-4">Site information</h4>
-            <div className="flex flex-wrap gap-4 md:gap-6">
-              <a href="https://www.stir.ac.uk/about/policy-legal-and-cookies/" className="text-gray-400 hover:text-white text-[14px] transition">Policy, Legal and Cookies</a>
-              <a href="https://www.stir.ac.uk/about/accessibility/" className="text-gray-400 hover:text-white text-[14px] transition">Accessibility statement</a>
-              <a href="https://www.stir.ac.uk/sitemap/" className="text-gray-400 hover:text-white text-[14px] transition">Sitemap</a>
-              <a href="https://www.stir.ac.uk/about/modern-slavery-statement/" className="text-gray-400 hover:text-white text-[14px] transition">Modern Slavery Statement</a>
-              <a href="https://www.stir.ac.uk/about/" className="text-gray-400 hover:text-white text-[14px] transition">Scottish Charity No SC011159</a>
-            </div>
+      {/* Developer Profile Section */}
+      <section className="py-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 mb-6">
+            <Code className="w-5 h-5 text-emerald-400" />
+            <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">About the Developer</span>
+          </div>
+          
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            Advanced Expertise in AI Solutions
+          </h2>
+          
+          <p className="text-lg text-slate-300 leading-relaxed mb-8 max-w-3xl mx-auto">
+            This project demonstrates comprehensive knowledge of modern AI system architecture, 
+            including LLM orchestration, vector databases, RAG pipelines, safety engineering, 
+            and production deployment patterns. Built as a research initiative to explore 
+            the capabilities of conversational AI in educational contexts.
+          </p>
+          
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a 
+              href="https://github.com/baqarjafri" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+            >
+              <Github className="w-5 h-5" />
+              <span className="font-medium">GitHub</span>
+            </a>
+            <a 
+              href="https://linkedin.com/in/syed-baqar-jafri" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+            >
+              <Linkedin className="w-5 h-5" />
+              <span className="font-medium">LinkedIn</span>
+            </a>
+            <a 
+              href="mailto:contact@example.com" 
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+              <Mail className="w-5 h-5" />
+              <span className="font-medium">Get in Touch</span>
+            </a>
           </div>
         </div>
+      </section>
 
-        {/* Contact & Copyright */}
-        <div className="max-w-[1400px] mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex flex-col md:flex-row items-center gap-4 text-[14px]">
-              <span className="font-semibold">Contact us</span>
-              <a href="tel:+441786473171" className="text-gray-400 hover:text-white transition">Tel: +44 (0) 1786 473171</a>
-              <a href="https://portal.stir.ac.uk/student/enquiry/ask.jsp" className="text-[#006938] hover:text-[#00a050] transition font-medium">Ask us a question ›</a>
+      {/* Chat CTA Section */}
+      <section className="py-16 bg-gradient-to-r from-emerald-600 to-emerald-700">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            Experience the AI Chat
+          </h2>
+          <p className="text-lg text-emerald-100 mb-8 max-w-2xl mx-auto">
+            Ask about courses, entry requirements, campus life, or anything about studying at the University of Stirling. 
+            The AI will provide accurate, contextual responses using the RAG system.
+          </p>
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('openChatWidget'))}
+            className="group inline-flex items-center gap-3 px-8 py-4 bg-white text-emerald-700 font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+          >
+            <MessageSquare className="w-6 h-6" />
+            Start Chatting Now
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      </section>
+
+      {/* Simple Footer */}
+      <footer className="bg-slate-900 text-slate-400 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <img 
+                src={IMAGES.logo}
+                alt="University of Stirling" 
+                className="h-8 opacity-60"
+              />
+              <span className="text-sm">Independent Research Project</span>
             </div>
-            <p className="text-gray-400 text-[14px]">© University of Stirling</p>
+            <p className="text-sm">
+              Built with React, FastAPI, LangGraph & Claude AI
+            </p>
           </div>
         </div>
       </footer>

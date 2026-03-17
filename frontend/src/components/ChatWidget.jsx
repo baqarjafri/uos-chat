@@ -49,6 +49,13 @@ export default function ChatWidget({ onOpenChange }) {
     }
   }, [isOpen, isMinimized])
 
+  // Listen for custom event from landing page to open chat
+  useEffect(() => {
+    const handleOpenChat = () => setIsOpen(true)
+    window.addEventListener('openChatWidget', handleOpenChat)
+    return () => window.removeEventListener('openChatWidget', handleOpenChat)
+  }, [])
+
   // Notify parent when chat open state changes
   useEffect(() => {
     if (onOpenChange) {
@@ -357,6 +364,7 @@ export default function ChatWidget({ onOpenChange }) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
+          data-chat-trigger
           className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-gradient-to-br from-green-600 to-green-700 text-white p-4 sm:p-5 rounded-full shadow-2xl hover:shadow-green-500/25 hover:scale-105 transition-all duration-300 z-50 group"
           aria-label="Open chat"
         >
