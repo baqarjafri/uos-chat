@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: str
     
     # CORS - Will be updated based on environment
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    CORS_ORIGINS: str = "https://ai-uos.up.railway.app,http://localhost:3000,http://localhost:5173"
     
     # Environment detection
     ENVIRONMENT: str = "development"
