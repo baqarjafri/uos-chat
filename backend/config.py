@@ -26,6 +26,16 @@ class Settings(BaseSettings):
     # CORS - Will be updated based on environment
     CORS_ORIGINS: str = "https://ai-uos.up.railway.app,http://localhost:3000,http://localhost:5173"
     
+    @property
+    def ALLOWED_ORIGINS(self) -> list:
+        """Get CORS origins with production origin always included"""
+        origins = self.CORS_ORIGINS.split(",")
+        # Always ensure production frontend is included
+        production_origin = "https://ai-uos.up.railway.app"
+        if production_origin not in origins:
+            origins.append(production_origin)
+        return origins
+    
     # Environment detection
     ENVIRONMENT: str = "development"
     
