@@ -65,8 +65,8 @@ const CHAT_FEATURES = [
     icon: Maximize2,
     title: 'Flexible UI',
     headline: 'Widget or fullscreen',
-    desc: 'Floating chat while browsing the showcase page, or fullscreen for longer sessions. Minimize anytime to read features below.',
-    highlight: 'Minimize restores full access to this page',
+    desc: 'Floating chat while browsing the showcase page, or fullscreen for longer sessions. Exit fullscreen to read features below.',
+    highlight: 'Fullscreen toggle in the chat header',
   },
 ]
 
@@ -251,7 +251,7 @@ export default function StirlingHomepage() {
             </h2>
             <p className="text-lg text-slate-600">
               This showcase page explains the system; the <strong>chat widget</strong> is the product.
-              Minimize the chat anytime to keep reading — your conversation stays open in the corner.
+              Use the floating widget while you scroll, or fullscreen when you want a larger view.
             </p>
           </div>
 
@@ -408,7 +408,7 @@ export default function StirlingHomepage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">Ready to try it?</h2>
           <p className="text-emerald-100 mb-6">
-            Ask about entry requirements, scholarships, or campus life. Use <strong>minimize</strong> on the chat header to return here anytime.
+            Ask about entry requirements, scholarships, or campus life. Exit fullscreen from the chat header to return here anytime.
           </p>
           <button
             type="button"

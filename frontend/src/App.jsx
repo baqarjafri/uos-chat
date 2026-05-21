@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-amber-500 text-black text-center py-2.5 px-4 font-semibold text-sm sm:text-base shadow-md sticky top-0 z-50">
+      <div className="bg-amber-500 text-black text-center py-2.5 px-4 font-semibold text-sm sm:text-base shadow-md sticky top-0 z-40">
         ⚠️ <strong>DISCLAIMER:</strong> Independent academic research project — not an official University of Stirling website.
       </div>
 

@@ -6,7 +6,6 @@ import FeedbackModal from './FeedbackModal'
 
 export default function ChatWidget({ onOpenChange }) {
   const [isOpen, setIsOpen] = useState(false)
-  const [isMinimized, setIsMinimized] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [messages, setMessages] = useState([])
   const [inputMessage, setInputMessage] = useState('')
@@ -44,10 +43,10 @@ export default function ChatWidget({ onOpenChange }) {
 
   // Focus input when chat opens
   useEffect(() => {
-    if (isOpen && !isMinimized && inputRef.current) {
+    if (isOpen && inputRef.current) {
       inputRef.current.focus()
     }
-  }, [isOpen, isMinimized])
+  }, [isOpen])
 
   // Listen for custom event from landing page to open chat
   useEffect(() => {
@@ -56,12 +55,11 @@ export default function ChatWidget({ onOpenChange }) {
     return () => window.removeEventListener('openChatWidget', handleOpenChat)
   }, [])
 
-  // Treat minimized chat as "closed" so the landing page is unobstructed
   useEffect(() => {
     if (onOpenChange) {
-      onOpenChange(isOpen && !isMinimized)
+      onOpenChange(isOpen)
     }
-  }, [isOpen, isMinimized, onOpenChange])
+  }, [isOpen, onOpenChange])
 
   const hasConversation = messages.length > 0 && sessionId
 
@@ -82,12 +80,6 @@ export default function ChatWidget({ onOpenChange }) {
     setConversationSummary(null)
     setShowFeedback(false)
     setIsOpen(false)
-    setIsMinimized(false)
-    setIsFullscreen(false)
-  }
-
-  const handleMinimize = () => {
-    setIsMinimized(true)
     setIsFullscreen(false)
   }
 
@@ -97,7 +89,6 @@ export default function ChatWidget({ onOpenChange }) {
 
   const openChat = () => {
     setIsOpen(true)
-    setIsMinimized(false)
   }
 
   const handleSendMessage = async () => {
@@ -357,7 +348,6 @@ export default function ChatWidget({ onOpenChange }) {
 
     if (shouldOfferFeedback()) {
       setShowFeedback(true)
-      setIsMinimized(false)
       setIsFullscreen(false)
     } else {
       markFeedbackDone()
@@ -415,11 +405,11 @@ export default function ChatWidget({ onOpenChange }) {
       )}
 
       {/* Chat Window - Responsive with Fullscreen Support */}
-      {isOpen && !isMinimized && (
-        <div className={`fixed bg-white flex flex-col z-40 overflow-hidden animate-slideUp transition-all duration-300 ease-in-out ${
+      {isOpen && (
+        <div className={`fixed bg-white flex flex-col overflow-hidden animate-slideUp transition-all duration-300 ease-in-out ${
           isFullscreen 
-            ? 'inset-0 rounded-none border-0 shadow-none' 
-            : 'inset-4 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[420px] sm:h-[650px] rounded-2xl shadow-2xl border border-gray-200'
+            ? 'left-0 right-0 bottom-0 top-11 z-[60] rounded-none border-0 shadow-none' 
+            : 'inset-4 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[420px] sm:h-[650px] rounded-2xl shadow-2xl border border-gray-200 z-50'
         }`}>
           
           {/* Header - Premium Design */}
@@ -435,7 +425,7 @@ export default function ChatWidget({ onOpenChange }) {
               {messages.length > 0 && (
                 <div className="relative animate-fadeInLogo">
                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm overflow-hidden">
-                    <img src="/images/stirling-logo.svg" alt="Stirling" className="w-10 h-10 object-cover" />
+                    <img src="/images/stirling round logo.png" alt="Stirling" className="w-10 h-10 object-contain" />
                   </div>
                   <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-300 rounded-full border-2 border-green-600"></span>
                 </div>
@@ -448,23 +438,20 @@ export default function ChatWidget({ onOpenChange }) {
             
             <div className="flex items-center space-x-1 relative z-10">
               <button
-                onClick={() => {
-                  setIsFullscreen(false)
-                  handleMinimize()
-                }}
-                className="hover:bg-white/20 p-2 rounded-lg transition-colors"
-                aria-label="Minimize chat"
-                title="Minimize — browse the main page"
-              >
-                <Minimize2 className="w-5 h-5" />
-              </button>
-              <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
                 className="hover:bg-white/20 p-2 rounded-lg transition-colors"
                 aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
                 title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
               >
-                <Maximize2 className="w-5 h-5" />
+                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+              </button>
+              <button
+                onClick={handleEndConversation}
+                className="hover:bg-white/20 p-2 rounded-lg transition-colors"
+                aria-label="Close chat"
+                title="Close chat"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -476,7 +463,7 @@ export default function ChatWidget({ onOpenChange }) {
             {messages.length === 0 && (
               <div className="text-center py-8 animate-fadeIn">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-100 to-green-200 mb-4 shadow-lg overflow-hidden">
-                  <img src="/images/stirling-logo.svg" alt="Stirling" className="w-16 h-16 object-cover" />
+                  <img src="/images/stirling round logo.png" alt="Stirling" className="w-16 h-16 object-contain" />
                 </div>
                 <h4 className="text-lg font-semibold text-gray-800 mb-2">Welcome to the University of Stirling!</h4>
                 <p className="text-gray-600 text-sm max-w-xs mx-auto leading-relaxed">
@@ -765,35 +752,6 @@ export default function ChatWidget({ onOpenChange }) {
               </span>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Minimized Chat Bar */}
-      {isOpen && isMinimized && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setIsMinimized(false)}
-            className="bg-gradient-to-r from-green-600 to-green-700 text-white px-5 py-3 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center space-x-3"
-            aria-label="Restore chat"
-          >
-            <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
-                <img src="/images/stirling-logo.svg" alt="Stirling" className="w-8 h-8 object-cover" />
-              </div>
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-300 rounded-full border-2 border-green-600" />
-            </div>
-            <span className="font-medium text-sm">Resume chat</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleCloseChat}
-            className="p-2.5 rounded-full bg-white border border-gray-200 text-gray-500 shadow-md hover:bg-gray-50 hover:text-gray-800 transition-colors"
-            aria-label="Dismiss chat"
-            title="Dismiss chat"
-          >
-            <X className="w-4 h-4" />
-          </button>
         </div>
       )}
 

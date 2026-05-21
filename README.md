@@ -86,7 +86,7 @@ These are the capabilities we surface on the main page for any new reviewer.
 | **Safe & on-topic** | Guardrails, topic boundaries, rate limits, injection checks. |
 | **Flexible UI** | Floating widget or fullscreen; **minimize** to read the showcase page without losing the thread. |
 
-**UX detail:** Feedback is **optional** and only offered when the user explicitly ends a conversation (not on every close). Minimize returns a small “Resume chat” pill so the landing page stays readable.
+**UX detail:** Feedback is **optional** and only offered when the user explicitly ends a conversation (not on every close). Fullscreen mode sits below the disclaimer bar; exit fullscreen via the header toggle to browse the showcase page.
 
 ---
 
