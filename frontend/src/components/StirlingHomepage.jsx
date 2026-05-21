@@ -81,7 +81,7 @@ const TECH_STACK = [
     category: 'AI & ML',
     icon: Brain,
     items: [
-      { name: 'Claude 3 Haiku', desc: 'Conversational responses' },
+      { name: 'Claude Sonnet 4', desc: 'Conversational responses' },
       { name: 'OpenAI Embeddings', desc: 'Semantic search (1,536D)' },
       { name: 'LangGraph', desc: 'Multi-agent orchestration' },
     ]

@@ -8,7 +8,7 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL_16-pgvector-4169E1?logo=postgresql&logoColor=white)](https://github.com/pgvector/pgvector)
-[![Claude](https://img.shields.io/badge/Claude_3_Haiku-Anthropic-D4A574)](https://www.anthropic.com/)
+[![Claude](https://img.shields.io/badge/Claude_Sonnet_4-Anthropic-D4A574)](https://www.anthropic.com/)
 [![Showcase](https://img.shields.io/badge/Live_site-Not_required-success)](docs/DEMO_ARCHIVE.md)
 
 **[Baqar Jafri](https://www.linkedin.com/in/thebaqarjafri/)** · MSc AI · University of Stirling  
@@ -27,12 +27,12 @@
 | | |
 |---|---|
 | **What** | AI assistant that answers questions about studying at Stirling (courses, fees, entry requirements, scholarships, campus life). |
-| **How** | **Hybrid RAG** over 1,206 university web pages → **LangGraph** (router → retrieval → optional lead capture) → **Claude 3 Haiku**. |
+| **How** | **Hybrid RAG** over 1,206 university web pages → **LangGraph** (router → retrieval → optional lead capture) → **Claude Sonnet 4** (`claude-sonnet-4-20250514`). |
 | **UI** | React showcase page + floating chat widget (quick topics, sources, fullscreen, minimize to browse features). |
 | **Why it matters** | Demonstrates production-style LLM engineering: retrieval quality, safety guardrails, session UX, and full deployable stack. |
 
 <p align="center">
-  <img src="docs/images/01-homepage-hero-v2.png" alt="Showcase homepage with hero, statistics, and navigation" width="920"/>
+  <img src="https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/01-homepage-hero-v2.png" alt="Showcase homepage with hero, statistics, and navigation" width="920"/>
 </p>
 
 ---
@@ -59,14 +59,14 @@ Everything a visitor would see on the showcase site is documented below.
 | Step | What you see | Screenshot |
 |:----:|--------------|------------|
 | 1 | Research disclaimer (once per browser) | — |
-| 2 | Hero + metrics + “Try the live chat” | [Hero](docs/images/01-homepage-hero-v2.png) |
-| 3 | **Six marketed chat features** (scroll the page) | [Features grid](docs/images/02-chat-features-grid.png) |
-| 4 | 3-agent “How it works” section | [Pipeline](docs/images/03-how-it-works.png) |
-| 5 | Open chat → quick topics → RAG answer | [Welcome](docs/images/04-chat-widget-open.png) · [Answer](docs/images/05-chat-rag-response.png) |
-| 6 | Fullscreen mode for longer sessions | [Fullscreen](docs/images/06-chat-fullscreen.png) |
+| 2 | Hero + metrics + “Try the live chat” | [Hero](https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/01-homepage-hero-v2.png) |
+| 3 | **Six marketed chat features** (scroll the page) | [Features grid](https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/02-chat-features-grid.png) |
+| 4 | 3-agent “How it works” section | [Pipeline](https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/03-how-it-works.png) |
+| 5 | Open chat → quick topics → RAG answer | [Welcome](https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/04-chat-widget-open.png) · [Answer](https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/05-chat-rag-response.png) |
+| 6 | Fullscreen mode for longer sessions | [Fullscreen](https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/06-chat-fullscreen.png) |
 
 <p align="center">
-  <img src="docs/images/02-chat-features-grid.png" alt="Six features built into the chat experience — natural conversation, RAG, quick topics, sources, safety, flexible UI" width="920"/>
+  <img src="https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/02-chat-features-grid.png" alt="Six features built into the chat experience — natural conversation, RAG, quick topics, sources, safety, flexible UI" width="920"/>
   <br/>
   <sub><b>Centerpiece of the showcase:</b> what the chat widget does for prospective students (not just backend jargon).</sub>
 </p>
@@ -93,13 +93,13 @@ These are the capabilities we surface on the main page for any new reviewer.
 ## Chat in action
 
 <p align="center">
-  <img src="docs/images/04-chat-widget-open.png" width="440" alt="Chat welcome screen"/>
+  <img src="https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/04-chat-widget-open.png" width="440" alt="Chat welcome screen"/>
   &nbsp;&nbsp;
-  <img src="docs/images/05-chat-rag-response.png" width="440" alt="RAG response about entry requirements"/>
+  <img src="https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/05-chat-rag-response.png" width="440" alt="RAG response about entry requirements"/>
 </p>
 
 <p align="center">
-  <img src="docs/images/06-chat-fullscreen.png" width="920" alt="Fullscreen chat"/>
+  <img src="https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/06-chat-fullscreen.png" width="920" alt="Fullscreen chat"/>
   <br/>
   <sub>Welcome chips → hybrid retrieval answer → optional fullscreen</sub>
 </p>
@@ -126,12 +126,12 @@ flowchart LR
   end
   A --> B --> R --> G --> L
   G --> D
-  G --> H[Claude 3 Haiku]
+  G --> H[Claude Sonnet 4]
   H --> A
 ```
 
 <p align="center">
-  <img src="docs/images/03-how-it-works.png" width="920" alt="Router, RAG, and Lead agents on the showcase page"/>
+  <img src="https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/03-how-it-works.png" width="920" alt="Router, RAG, and Lead agents on the showcase page"/>
 </p>
 
 | Agent | Role |
@@ -147,14 +147,14 @@ flowchart LR
 ## Technology stack
 
 <p align="center">
-  <img src="docs/images/08-tech-stack.png" width="920" alt="Technology stack"/>
+  <img src="https://raw.githubusercontent.com/baqarjafri/uos-chat/main/docs/images/08-tech-stack.png" width="920" alt="Technology stack"/>
 </p>
 
 | Layer | Stack |
 |-------|--------|
 | Frontend | React 18, Vite, TailwindCSS, Lucide, Axios |
 | Backend | FastAPI, Pydantic, Uvicorn |
-| AI | Claude 3 Haiku, OpenAI `text-embedding-3-small`, LangGraph |
+| AI | Claude Sonnet 4 (`claude-sonnet-4-20250514`), OpenAI `text-embedding-3-small`, LangGraph |
 | Data | PostgreSQL 16, pgvector, FireCrawl |
 | Ops (reference) | Docker, Railway configs in `backend/` & `frontend/` |
 
@@ -182,7 +182,7 @@ flowchart LR
 ```bash
 git clone https://github.com/baqarjafri/uos-chat.git
 cd uos-chat
-cp .env.example .env   # add API keys
+cp .env.example .env   # add API keys (LLM_MODEL defaults to Claude Sonnet 4)
 
 docker-compose up -d   # Postgres + pgvector :5433
 

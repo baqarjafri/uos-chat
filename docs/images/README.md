@@ -14,4 +14,8 @@ Production-quality captures for the GitHub README. **No live website required** 
 | `08-tech-stack.png` | Technology stack grid |
 | `09-core-capabilities.png` | Research capabilities (legacy layout) |
 
-Captured May 2026 from production and local preview builds.
+Captured May 2026 from production (chat flows) and local preview (`npm run dev` on port 3000).
+
+**README tip:** GitHub renders `<img src="docs/images/…">` unreliably; the root README uses `raw.githubusercontent.com` URLs instead.
+
+**Regenerate hero / features / stack:** open `http://localhost:3000`, accept the disclaimer, then screenshot `#chat-features`, `#how-it-works`, and `#technology`.

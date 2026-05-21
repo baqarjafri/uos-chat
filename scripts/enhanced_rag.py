@@ -105,6 +105,11 @@ class RAGConfig:
         'postgraduate': ['PG', 'masters', 'MSc', 'MA', 'PhD'],
     }
     
+    # LLM (read from .env — must match README and .env.example)
+    LLM_MODEL = os.getenv("LLM_MODEL", "claude-sonnet-4-20250514")
+    LLM_MAX_TOKENS = int(os.getenv("MAX_RESPONSE_TOKENS", "750"))
+    LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.7"))
+
     # Program code mappings (for query expansion)
     PROGRAM_CODES = {
         'computer science': 'G400',
@@ -517,13 +522,10 @@ class AnswerGenerator:
             student_type, student_level, detected_programs
         )
         
-        # Generate answer with Claude Sonnet 4 (reliable, working model)
-        # Good instruction following and consistent output
-        # Response time ~8-12 seconds
         response = self.client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=750,
-            temperature=0.7,  # Natural conversational tone (default is 1.0)
+            model=RAGConfig.LLM_MODEL,
+            max_tokens=RAGConfig.LLM_MAX_TOKENS,
+            temperature=RAGConfig.LLM_TEMPERATURE,
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}]
         )

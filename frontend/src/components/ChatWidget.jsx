@@ -435,7 +435,7 @@ export default function ChatWidget({ onOpenChange }) {
               {messages.length > 0 && (
                 <div className="relative animate-fadeInLogo">
                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm overflow-hidden">
-                    <img src="/images/stirling round logo.png" alt="Stirling" className="w-10 h-10 object-cover" />
+                    <img src="/images/stirling-logo.svg" alt="Stirling" className="w-10 h-10 object-cover" />
                   </div>
                   <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-300 rounded-full border-2 border-green-600"></span>
                 </div>
@@ -476,7 +476,7 @@ export default function ChatWidget({ onOpenChange }) {
             {messages.length === 0 && (
               <div className="text-center py-8 animate-fadeIn">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-100 to-green-200 mb-4 shadow-lg overflow-hidden">
-                  <img src="/images/stirling round logo.png" alt="Stirling" className="w-16 h-16 object-cover" />
+                  <img src="/images/stirling-logo.svg" alt="Stirling" className="w-16 h-16 object-cover" />
                 </div>
                 <h4 className="text-lg font-semibold text-gray-800 mb-2">Welcome to the University of Stirling!</h4>
                 <p className="text-gray-600 text-sm max-w-xs mx-auto leading-relaxed">
@@ -779,7 +779,7 @@ export default function ChatWidget({ onOpenChange }) {
           >
             <div className="relative">
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
-                <img src="/images/stirling round logo.png" alt="Stirling" className="w-8 h-8 object-cover" />
+                <img src="/images/stirling-logo.svg" alt="Stirling" className="w-8 h-8 object-cover" />
               </div>
               <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-300 rounded-full border-2 border-green-600" />
             </div>
