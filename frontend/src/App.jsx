@@ -1,47 +1,61 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import StirlingHomepage from './components/StirlingHomepage'
 import ChatWidget from './components/ChatWidget'
 import DisclaimerModal from './components/DisclaimerModal'
+import { X } from 'lucide-react'
+
+const CHAT_HINT_KEY = 'stirling_chat_hint_dismissed'
 
 function App() {
   const [isChatOpen, setIsChatOpen] = useState(false)
+  const [showChatHint, setShowChatHint] = useState(false)
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem(CHAT_HINT_KEY)
+    const disclaimerAccepted = localStorage.getItem('stirling_disclaimer_accepted')
+    if (!dismissed && disclaimerAccepted) {
+      const timer = setTimeout(() => setShowChatHint(true), 2500)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  const dismissChatHint = () => {
+    localStorage.setItem(CHAT_HINT_KEY, 'true')
+    setShowChatHint(false)
+  }
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Permanent Research Disclaimer Banner - Always visible at top */}
-      <div className="bg-amber-500 text-black text-center py-3 px-4 font-bold text-lg shadow-md">
-        ⚠️ <strong>DISCLAIMER:</strong> This is an independent academic research project for research purposes only. This is NOT an official University of Stirling website.
+      <div className="bg-amber-500 text-black text-center py-2.5 px-4 font-semibold text-sm sm:text-base shadow-md sticky top-0 z-50">
+        ⚠️ <strong>DISCLAIMER:</strong> Independent academic research project — not an official University of Stirling website.
       </div>
-      
-      {/* Academic Research Disclaimer Modal - Shows on first visit only */}
+
       <DisclaimerModal />
-      
-      {/* Stirling University Homepage Clone */}
+
       <StirlingHomepage />
-      
-      {/* Chat Widget (Bottom Right Corner) */}
+
       <ChatWidget onOpenChange={setIsChatOpen} />
 
-      {/* Blinking Arrow Pointing to Chat Widget - Only visible when chat is closed */}
-      {!isChatOpen && (
-        <div className="fixed bottom-24 right-6 z-[9998] flex items-center gap-2 animate-bounce">
-          <div className="bg-[#006938] text-white px-3 py-2 rounded-lg shadow-lg text-sm font-semibold whitespace-nowrap">
-            Try our AI Chat! →
-          </div>
-          <div className="text-4xl animate-pulse">👇</div>
+      {showChatHint && !isChatOpen && (
+        <div className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-30 flex items-center gap-2 max-w-[calc(100vw-2rem)]">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('openChatWidget'))}
+            className="flex items-center gap-2 bg-[#006938] text-white pl-4 pr-3 py-2.5 rounded-xl shadow-lg text-sm font-semibold hover:bg-[#005530] transition-colors"
+          >
+            Try the AI chat
+            <span aria-hidden>→</span>
+          </button>
+          <button
+            type="button"
+            onClick={dismissChatHint}
+            className="p-2 rounded-full bg-white border border-gray-200 text-gray-500 shadow-md hover:bg-gray-50"
+            aria-label="Dismiss hint"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
-
-      {/* Custom CSS for blinking animation */}
-      <style>{`
-        @keyframes blink {
-          0%, 50% { opacity: 1; }
-          51%, 100% { opacity: 0.3; }
-        }
-        .animate-blink {
-          animation: blink 1s infinite;
-        }
-      `}</style>
     </div>
   )
 }

@@ -2,275 +2,258 @@
 
 # Stirling University AI Chat Assistant
 
-**An enterprise-style RAG chatbot for prospective students — built as an independent MSc research project**
+### Full-stack RAG chatbot for prospective students · MSc research project
 
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-pgvector-4169E1?logo=postgresql&logoColor=white)](https://github.com/pgvector/pgvector)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL_16-pgvector-4169E1?logo=postgresql&logoColor=white)](https://github.com/pgvector/pgvector)
 [![Claude](https://img.shields.io/badge/Claude_3_Haiku-Anthropic-D4A574)](https://www.anthropic.com/)
-[![Status](https://img.shields.io/badge/Live_demo-Archived_2026-lightgrey)](docs/DEMO_ARCHIVE.md)
+[![Showcase](https://img.shields.io/badge/Live_site-Not_required-success)](docs/DEMO_ARCHIVE.md)
 
-*Retrieval-Augmented Generation · LangGraph multi-agent orchestration · Hybrid search · Safety guardrails · Lead capture*
+**[Baqar Jafri](https://www.linkedin.com/in/thebaqarjafri/)** · MSc AI · University of Stirling  
+**Repo:** [github.com/baqarjafri/uos-chat](https://github.com/baqarjafri/uos-chat)
 
-**Author:** [Baqar Jafri](https://www.linkedin.com/in/thebaqarjafri/) · MSc AI, University of Stirling  
-**Repository:** [github.com/baqarjafri/uos-chat](https://github.com/baqarjafri/uos-chat)
+> This README is the **complete portfolio walkthrough**. Screenshots, architecture, and feature breakdowns are included — you do **not** need a hosted demo to understand the project.
 
-> ⚠️ **Research disclaimer:** This is **not** an official University of Stirling product or website. It is a proof-of-concept for academic evaluation.
+> ⚠️ Independent academic research — **not** an official University of Stirling service.
 
 </div>
 
 ---
 
-## What this project is
+## Start here (60 seconds)
 
-A full-stack conversational AI system that answers questions about studying at the University of Stirling — courses, entry requirements, fees, scholarships, campus life, and applications — using **1,200+ scraped university pages**, **hybrid RAG retrieval**, and a **3-agent LangGraph** pipeline.
-
-The live Railway demo has been **archived**; this README and the screenshots below are the primary showcase. You can still run everything locally (see [Quick start](#quick-start-local-development)).
+| | |
+|---|---|
+| **What** | AI assistant that answers questions about studying at Stirling (courses, fees, entry requirements, scholarships, campus life). |
+| **How** | **Hybrid RAG** over 1,206 university web pages → **LangGraph** (router → retrieval → optional lead capture) → **Claude 3 Haiku**. |
+| **UI** | React showcase page + floating chat widget (quick topics, sources, fullscreen, minimize to browse features). |
+| **Why it matters** | Demonstrates production-style LLM engineering: retrieval quality, safety guardrails, session UX, and full deployable stack. |
 
 <p align="center">
-  <img src="docs/images/01-homepage-hero.png" alt="Landing page hero — Stirling University AI Chat Assistant with project stats" width="900"/>
-  <br/>
-  <em>Landing page: project positioning, metrics, and entry to the chat widget</em>
+  <img src="docs/images/01-homepage-hero-v2.png" alt="Showcase homepage with hero, statistics, and navigation" width="920"/>
 </p>
 
 ---
 
 ## Table of contents
 
-- [Visual tour](#visual-tour)
-- [Key features](#key-features)
-- [Chat experience](#chat-experience)
-- [System architecture](#system-architecture)
-- [Technology stack](#technology-stack)
-- [At a glance](#at-a-glance)
-- [Quick start (local development)](#quick-start-local-development)
-- [Project structure](#project-structure)
-- [API endpoints](#api-endpoints)
-- [Documentation](#documentation)
-- [License & disclaimer](#license--disclaimer)
+1. [Visual product tour](#visual-product-tour)  
+2. [Six chat features (the product)](#six-chat-features-the-product)  
+3. [Chat in action](#chat-in-action)  
+4. [How the AI pipeline works](#how-the-ai-pipeline-works)  
+5. [Technology stack](#technology-stack)  
+6. [By the numbers](#by-the-numbers)  
+7. [Run it locally](#run-it-locally)  
+8. [Repository map](#repository-map)  
+9. [API reference](#api-reference)  
+10. [More documentation](#more-documentation)  
 
 ---
 
-## Visual tour
+## Visual product tour
 
-### Research landing page
+Everything a visitor would see on the showcase site is documented below.
 
-The frontend is a dedicated **research showcase** (not a generic embed): hero, architecture narrative, tech stack grid, capabilities, and developer attribution — with Stirling branding and clear academic disclaimers.
-
-| Section | Screenshot |
-|---------|------------|
-| **3-agent orchestration** | <img src="docs/images/07-architecture-agents.png" width="420" alt="LangGraph router, RAG, and lead agents"/> |
-| **Enterprise tech stack** | <img src="docs/images/08-tech-stack.png" width="420" alt="AI, RAG, safety, backend, frontend, data pipeline"/> |
-| **Core capabilities** | <img src="docs/images/09-core-capabilities.png" width="420" alt="Hybrid RAG, safety, lead capture, feedback"/> |
-
----
-
-## Key features
-
-| Area | What it does |
-|------|----------------|
-| **Conversational AI** | Claude 3 Haiku with session memory and formatted answers (links, bold, contact details) |
-| **Hybrid RAG** | Vector search (pgvector) + BM25 keyword search with re-ranking |
-| **Multi-agent flow** | Router → RAG → Lead capture via LangGraph state machine |
-| **Safety guardrails** | Topic boundaries, prompt-injection checks, rate limits, incident logging |
-| **Lead capture** | Progressive contact collection with journey tracking |
-| **Feedback** | End-of-chat ratings (good / average / bad) with optional suggestions |
-| **Production UI** | Floating widget, quick-action chips, fullscreen mode, source links |
-| **Data pipeline** | FireCrawl scraping → chunking → OpenAI embeddings → PostgreSQL |
-
----
-
-## Chat experience
-
-The chat widget sits on the landing page (bottom-right), with quick topics, fullscreen mode, and RAG-backed answers citing university content.
+| Step | What you see | Screenshot |
+|:----:|--------------|------------|
+| 1 | Research disclaimer (once per browser) | — |
+| 2 | Hero + metrics + “Try the live chat” | [Hero](docs/images/01-homepage-hero-v2.png) |
+| 3 | **Six marketed chat features** (scroll the page) | [Features grid](docs/images/02-chat-features-grid.png) |
+| 4 | 3-agent “How it works” section | [Pipeline](docs/images/03-how-it-works.png) |
+| 5 | Open chat → quick topics → RAG answer | [Welcome](docs/images/04-chat-widget-open.png) · [Answer](docs/images/05-chat-rag-response.png) |
+| 6 | Fullscreen mode for longer sessions | [Fullscreen](docs/images/06-chat-fullscreen.png) |
 
 <p align="center">
-  <img src="docs/images/04-chat-widget-open.png" alt="Chat widget welcome state with quick action buttons" width="480"/>
+  <img src="docs/images/02-chat-features-grid.png" alt="Six features built into the chat experience — natural conversation, RAG, quick topics, sources, safety, flexible UI" width="920"/>
+  <br/>
+  <sub><b>Centerpiece of the showcase:</b> what the chat widget does for prospective students (not just backend jargon).</sub>
+</p>
+
+---
+
+## Six chat features (the product)
+
+These are the capabilities we surface on the main page for any new reviewer.
+
+| Feature | Benefit for students |
+|---------|----------------------|
+| **Natural conversation** | Ask in plain English; the assistant keeps session context. |
+| **RAG-backed answers** | Responses grounded in real stir.ac.uk content — not generic hallucinations. |
+| **One-tap starters** | Chips for intake, entry requirements, scholarships, apply, campus life. |
+| **Trust & transparency** | Related official pages linked under each answer. |
+| **Safe & on-topic** | Guardrails, topic boundaries, rate limits, injection checks. |
+| **Flexible UI** | Floating widget or fullscreen; **minimize** to read the showcase page without losing the thread. |
+
+**UX detail:** Feedback is **optional** and only offered when the user explicitly ends a conversation (not on every close). Minimize returns a small “Resume chat” pill so the landing page stays readable.
+
+---
+
+## Chat in action
+
+<p align="center">
+  <img src="docs/images/04-chat-widget-open.png" width="440" alt="Chat welcome screen"/>
   &nbsp;&nbsp;
-  <img src="docs/images/05-chat-rag-response.png" alt="Chat showing RAG response about entry requirements" width="480"/>
-  <br/>
-  <em>Left: welcome & quick actions · Right: live RAG answer (entry requirements)</em>
+  <img src="docs/images/05-chat-rag-response.png" width="440" alt="RAG response about entry requirements"/>
 </p>
 
 <p align="center">
-  <img src="docs/images/06-chat-fullscreen.png" alt="Fullscreen chat mode with conversation" width="900"/>
+  <img src="docs/images/06-chat-fullscreen.png" width="920" alt="Fullscreen chat"/>
   <br/>
-  <em>Fullscreen mode for longer conversations</em>
+  <sub>Welcome chips → hybrid retrieval answer → optional fullscreen</sub>
 </p>
-
-**Chat UX highlights**
-
-- Quick actions: Next intake, Entry requirements, Scholarships, How to apply, Campus life  
-- Smart scroll: new assistant messages align to the top for readability  
-- Source links to stir.ac.uk pages where relevant  
-- End chat → feedback modal  
-- Initial disclaimer modal (stored in browser local storage)
 
 ---
 
-## System architecture
+## How the AI pipeline works
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  React + Vite + Tailwind  (ChatWidget, StirlingHomepage, etc.) │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │ REST
-┌───────────────────────────────▼─────────────────────────────────┐
-│  FastAPI  ·  LangGraph 3-agent pipeline                         │
-│  Router Agent → RAG Agent → Lead Capture Agent                  │
-│  Guardrails · Rate limiting · Feedback API                      │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │ SQL + vectors
-┌───────────────────────────────▼─────────────────────────────────┐
-│  PostgreSQL 16 + pgvector                                     │
-│  1,206 documents · 15,000+ chunks · 13 tables · 30+ indexes    │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+  subgraph UI["React showcase + chat widget"]
+    A[User message]
+  end
+  subgraph API["FastAPI"]
+    B[LangGraph]
+  end
+  subgraph Agents["Three agents"]
+    R[Router]
+    G[RAG + rerank]
+    L[Lead capture]
+  end
+  subgraph Data["PostgreSQL + pgvector"]
+    D[(1,206 docs · 15k+ chunks)]
+  end
+  A --> B --> R --> G --> L
+  G --> D
+  G --> H[Claude 3 Haiku]
+  H --> A
 ```
 
 <p align="center">
-  <img src="docs/images/07-architecture-agents.png" alt="Three-agent architecture section on the landing page" width="900"/>
+  <img src="docs/images/03-how-it-works.png" width="920" alt="Router, RAG, and Lead agents on the showcase page"/>
 </p>
+
+| Agent | Role |
+|-------|------|
+| **Router** | Classifies intent and routes the query |
+| **RAG** | Hybrid vector + BM25 retrieval, re-ranking, answer synthesis |
+| **Lead** | Progressive contact capture when appropriate |
+
+**Also included:** safety guardrails, conversation logging, optional feedback API, FireCrawl ingestion pipeline.
 
 ---
 
 ## Technology stack
 
 <p align="center">
-  <img src="docs/images/08-tech-stack.png" alt="Technology stack grid on landing page" width="900"/>
+  <img src="docs/images/08-tech-stack.png" width="920" alt="Technology stack"/>
 </p>
 
-| Layer | Technologies |
-|-------|----------------|
-| **Frontend** | React 18, Vite, TailwindCSS, Lucide icons, Axios |
-| **Backend** | FastAPI, Pydantic, Uvicorn |
-| **AI** | Claude 3 Haiku, OpenAI `text-embedding-3-small`, LangGraph |
-| **Data** | PostgreSQL 16, pgvector, FireCrawl |
-| **Deploy (reference)** | Docker, Railway configs (`Dockerfile.railway`, `railway.toml`) |
+| Layer | Stack |
+|-------|--------|
+| Frontend | React 18, Vite, TailwindCSS, Lucide, Axios |
+| Backend | FastAPI, Pydantic, Uvicorn |
+| AI | Claude 3 Haiku, OpenAI `text-embedding-3-small`, LangGraph |
+| Data | PostgreSQL 16, pgvector, FireCrawl |
+| Ops (reference) | Docker, Railway configs in `backend/` & `frontend/` |
 
 ---
 
-## At a glance
+## By the numbers
 
 | Metric | Value |
 |--------|-------|
 | University pages indexed | **1,206** |
-| Text chunks | **15,000+** |
+| Knowledge chunks | **15,000+** |
 | Embedding dimensions | **1,536** |
 | Database tables | **13** |
-| API endpoints | **7** |
+| REST endpoints | **7** |
 | Orchestrated agents | **3** |
 
 ---
 
-## Quick start (local development)
+## Run it locally
 
-### Prerequisites
+> Optional — only if you want to run the stack yourself. The README above is sufficient for portfolio review.
 
-- Python **3.11+**, Node **20+**, Docker Desktop  
-- **OpenAI** key (embeddings) and **Anthropic** key (Claude)
-
-### 1. Clone and configure
+**Prerequisites:** Python 3.11+, Node 20+, Docker, OpenAI + Anthropic API keys.
 
 ```bash
 git clone https://github.com/baqarjafri/uos-chat.git
 cd uos-chat
-cp .env.example .env
-# Add OPENAI_API_KEY and ANTHROPIC_API_KEY to .env
-```
+cp .env.example .env   # add API keys
 
-### 2. Database
+docker-compose up -d   # Postgres + pgvector :5433
 
-```bash
-docker-compose up -d
-# PostgreSQL + pgvector on localhost:5433
-```
-
-### 3. Backend (port **8001**)
-
-```bash
-python -m venv venv
-venv\Scripts\activate          # Windows
-# source venv/bin/activate     # macOS/Linux
+# Terminal 1 — API
 pip install -r requirements.txt
-cd backend
-python main.py
-```
+cd backend && python main.py    # http://localhost:8001
 
-### 4. Frontend (port **3000**)
-
-```bash
-cd frontend
-npm install
-npm run dev
+# Terminal 2 — UI
+cd frontend && npm install && npm run dev   # http://localhost:3000
 ```
 
 | Service | URL |
 |---------|-----|
-| App | http://localhost:3000 |
+| Showcase UI | http://localhost:3000 |
 | API docs | http://localhost:8001/docs |
-| Health | http://localhost:8001/health |
-
-For Docker-based frontend: `cd frontend && docker-compose up -d`.
 
 ---
 
-## Project structure
+## Repository map
 
 ```
-stirling_chat/
-├── backend/           # FastAPI, migrate.py, Railway Dockerfiles
-├── frontend/          # React UI (ChatWidget, StirlingHomepage, modals)
-├── scripts/           # RAG, LangGraph, guardrails, scraping, embeddings
-├── database/          # SQL schemas
-├── docs/images/       # README screenshots (production capture)
-├── tutorials/         # Step-by-step guides
-└── docker-compose.yml # Local PostgreSQL
+uos-chat/
+├── frontend/src/components/
+│   ├── ChatWidget.jsx        # Chat UI, minimize, RAG display, sources
+│   ├── StirlingHomepage.jsx  # Showcase landing + feature marketing
+│   ├── FeedbackModal.jsx     # Optional end-of-session feedback
+│   └── DisclaimerModal.jsx
+├── backend/                  # FastAPI + migrate.py
+├── scripts/                  # RAG, LangGraph, guardrails, scraping
+├── docs/images/              # README screenshot gallery
+└── tutorials/stirling_chat_guide/
 ```
 
 ---
 
-## API endpoints
+## API reference
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/chat` | Message → AI answer + sources |
-| `GET` | `/conversation/{session_id}` | Conversation history |
-| `POST` | `/conversation/{session_id}/end` | End session (triggers feedback) |
-| `POST` | `/feedback` | Submit rating |
-| `GET` | `/feedback/stats` | Aggregate feedback |
-| `GET` | `/feedback/bad` | Bad feedback for review |
-| `GET` | `/health` | Health + DB status |
-
-Interactive docs: http://localhost:8001/docs (when backend is running).
+| `POST` | `/chat` | Message → answer + sources |
+| `GET` | `/conversation/{id}` | History |
+| `POST` | `/conversation/{id}/end` | End session |
+| `POST` | `/feedback` | Rating (optional) |
+| `GET` | `/health` | Health check |
 
 ---
 
-## Documentation
+## More documentation
 
-| Document | Purpose |
-|----------|---------|
-| [docs/DEMO_ARCHIVE.md](docs/DEMO_ARCHIVE.md) | Why the live demo was retired |
-| [docs/RAILWAY_TEARDOWN.md](docs/RAILWAY_TEARDOWN.md) | Remove Railway services safely |
-| [DEPLOYMENT_STRUCTURE.md](DEPLOYMENT_STRUCTURE.md) | Local vs Railway file layout |
-| [RAILWAY_DEPLOYMENT_GUIDE.md](RAILWAY_DEPLOYMENT_GUIDE.md) | Full deployment walkthrough |
-| [PRE_DEPLOYMENT_CHECKLIST.md](PRE_DEPLOYMENT_CHECKLIST.md) | Pre-deploy checklist |
-| [tutorials/stirling_chat_guide/](tutorials/stirling_chat_guide/) | In-depth technical tutorials |
+| Doc | Purpose |
+|-----|---------|
+| [docs/images/README.md](docs/images/README.md) | Screenshot index |
+| [docs/DEMO_ARCHIVE.md](docs/DEMO_ARCHIVE.md) | Why we retired the live Railway URL |
+| [docs/RAILWAY_TEARDOWN.md](docs/RAILWAY_TEARDOWN.md) | Remove hosted services |
+| [tutorials/stirling_chat_guide/](tutorials/stirling_chat_guide/) | Deep technical tutorials |
+| [DEPLOYMENT_STRUCTURE.md](DEPLOYMENT_STRUCTURE.md) | Deploy file layout |
 
 ---
 
 ## License & disclaimer
 
-This project is released under the [MIT License](LICENSE) for portfolio and educational use.
+[MIT License](LICENSE) — portfolio and educational use.
 
-It remains an **independent academic research proof-of-concept**, not affiliated with or endorsed by the University of Stirling. Do not use it for official university business or as a substitute for stir.ac.uk.
+This project is **not** affiliated with or endorsed by the University of Stirling. Do not use it for official university business.
 
 ---
 
 <div align="center">
 
-**Built by [Baqar Jafri](https://www.linkedin.com/in/thebaqarjafri/)** · University of Stirling MSc AI  
+**Built by [Baqar Jafri](https://www.linkedin.com/in/thebaqarjafri/)**
 
-If this README helped you understand the work, consider starring the repository.
+*If this README helped you evaluate the work, a star on the repo is appreciated.*
 
 </div>

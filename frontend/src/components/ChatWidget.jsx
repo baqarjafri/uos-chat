@@ -56,12 +56,49 @@ export default function ChatWidget({ onOpenChange }) {
     return () => window.removeEventListener('openChatWidget', handleOpenChat)
   }, [])
 
-  // Notify parent when chat open state changes
+  // Treat minimized chat as "closed" so the landing page is unobstructed
   useEffect(() => {
     if (onOpenChange) {
-      onOpenChange(isOpen)
+      onOpenChange(isOpen && !isMinimized)
     }
-  }, [isOpen, onOpenChange])
+  }, [isOpen, isMinimized, onOpenChange])
+
+  const hasConversation = messages.length > 0 && sessionId
+
+  const shouldOfferFeedback = () => {
+    if (!sessionId || messages.length < 2) return false
+    return !sessionStorage.getItem(`stirling_feedback_done_${sessionId}`)
+  }
+
+  const markFeedbackDone = () => {
+    if (sessionId) {
+      sessionStorage.setItem(`stirling_feedback_done_${sessionId}`, 'true')
+    }
+  }
+
+  const resetChatState = () => {
+    setMessages([])
+    setSessionId(null)
+    setConversationSummary(null)
+    setShowFeedback(false)
+    setIsOpen(false)
+    setIsMinimized(false)
+    setIsFullscreen(false)
+  }
+
+  const handleMinimize = () => {
+    setIsMinimized(true)
+    setIsFullscreen(false)
+  }
+
+  const handleCloseChat = () => {
+    resetChatState()
+  }
+
+  const openChat = () => {
+    setIsOpen(true)
+    setIsMinimized(false)
+  }
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return
@@ -305,36 +342,37 @@ export default function ChatWidget({ onOpenChange }) {
   // Alias for backward compatibility
   const renderInlineBold = renderFormattedText;
 
-  const handleEndChat = async () => {
+  const handleEndConversation = async () => {
     if (!sessionId) {
-      setIsOpen(false)
+      handleCloseChat()
       return
     }
 
     try {
       const response = await axios.post(API_ENDPOINTS.END_CONVERSATION(sessionId))
       setConversationSummary(response.data)
-      setShowFeedback(true)
     } catch (error) {
       console.error('End conversation error:', error)
+    }
+
+    if (shouldOfferFeedback()) {
       setShowFeedback(true)
+      setIsMinimized(false)
+      setIsFullscreen(false)
+    } else {
+      markFeedbackDone()
+      handleCloseChat()
     }
   }
 
   const handleFeedbackSubmit = () => {
-    setMessages([])
-    setSessionId(null)
-    setShowFeedback(false)
-    setConversationSummary(null)
-    setIsOpen(false)
+    markFeedbackDone()
+    resetChatState()
   }
 
   const handleFeedbackSkip = () => {
-    setMessages([])
-    setSessionId(null)
-    setShowFeedback(false)
-    setConversationSummary(null)
-    setIsOpen(false)
+    markFeedbackDone()
+    resetChatState()
   }
 
   // Typing indicator component
@@ -363,7 +401,7 @@ export default function ChatWidget({ onOpenChange }) {
       {/* Floating Chat Button */}
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={openChat}
           data-chat-trigger
           className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-gradient-to-br from-green-600 to-green-700 text-white p-4 sm:p-5 rounded-full shadow-2xl hover:shadow-green-500/25 hover:scale-105 transition-all duration-300 z-50 group"
           aria-label="Open chat"
@@ -378,7 +416,7 @@ export default function ChatWidget({ onOpenChange }) {
 
       {/* Chat Window - Responsive with Fullscreen Support */}
       {isOpen && !isMinimized && (
-        <div className={`fixed bg-white flex flex-col z-50 overflow-hidden animate-slideUp transition-all duration-300 ease-in-out ${
+        <div className={`fixed bg-white flex flex-col z-40 overflow-hidden animate-slideUp transition-all duration-300 ease-in-out ${
           isFullscreen 
             ? 'inset-0 rounded-none border-0 shadow-none' 
             : 'inset-4 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[420px] sm:h-[650px] rounded-2xl shadow-2xl border border-gray-200'
@@ -410,19 +448,23 @@ export default function ChatWidget({ onOpenChange }) {
             
             <div className="flex items-center space-x-1 relative z-10">
               <button
+                onClick={() => {
+                  setIsFullscreen(false)
+                  handleMinimize()
+                }}
+                className="hover:bg-white/20 p-2 rounded-lg transition-colors"
+                aria-label="Minimize chat"
+                title="Minimize — browse the main page"
+              >
+                <Minimize2 className="w-5 h-5" />
+              </button>
+              <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
                 className="hover:bg-white/20 p-2 rounded-lg transition-colors"
                 aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
                 title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
               >
-                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-              </button>
-              <button
-                onClick={handleEndChat}
-                className="hover:bg-white/20 p-2 rounded-lg transition-colors"
-                aria-label="Close chat"
-              >
-                <X className="w-5 h-5" />
+                <Maximize2 className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -698,8 +740,17 @@ export default function ChatWidget({ onOpenChange }) {
               </button>
             </div>
             
-            {/* Footer info */}
-            <div className="flex items-center justify-center mt-3">
+            {/* Footer */}
+            <div className="flex flex-col items-center gap-2 mt-3">
+              {hasConversation && (
+                <button
+                  type="button"
+                  onClick={handleEndConversation}
+                  className="text-xs text-gray-500 hover:text-green-700 underline underline-offset-2 transition-colors"
+                >
+                  End conversation &amp; leave optional feedback
+                </button>
+              )}
               <span className="text-[10px] text-gray-400 font-light tracking-wide">
                 Developed by{' '}
                 <a 
@@ -719,20 +770,27 @@ export default function ChatWidget({ onOpenChange }) {
 
       {/* Minimized Chat Bar */}
       {isOpen && isMinimized && (
-        <div 
-          onClick={() => setIsMinimized(false)}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-gradient-to-r from-green-600 to-green-700 text-white px-5 py-3 rounded-full shadow-xl cursor-pointer hover:shadow-2xl hover:scale-105 transition-all z-50 flex items-center space-x-3"
-        >
-          <div className="relative">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
-              <img src="/images/stirling round logo.png" alt="Stirling" className="w-8 h-8 object-cover" />
-            </div>
-            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-300 rounded-full border-2 border-green-600"></span>
-          </div>
-          <span className="font-medium">Stirling Assistant</span>
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex items-center gap-2">
           <button
-            onClick={(e) => { e.stopPropagation(); handleEndChat(); }}
-            className="ml-2 hover:bg-white/20 p-1 rounded-full transition-colors"
+            type="button"
+            onClick={() => setIsMinimized(false)}
+            className="bg-gradient-to-r from-green-600 to-green-700 text-white px-5 py-3 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center space-x-3"
+            aria-label="Restore chat"
+          >
+            <div className="relative">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
+                <img src="/images/stirling round logo.png" alt="Stirling" className="w-8 h-8 object-cover" />
+              </div>
+              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-300 rounded-full border-2 border-green-600" />
+            </div>
+            <span className="font-medium text-sm">Resume chat</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleCloseChat}
+            className="p-2.5 rounded-full bg-white border border-gray-200 text-gray-500 shadow-md hover:bg-gray-50 hover:text-gray-800 transition-colors"
+            aria-label="Dismiss chat"
+            title="Dismiss chat"
           >
             <X className="w-4 h-4" />
           </button>
@@ -746,6 +804,7 @@ export default function ChatWidget({ onOpenChange }) {
           conversationSummary={conversationSummary}
           onSubmit={handleFeedbackSubmit}
           onSkip={handleFeedbackSkip}
+          variant="panel"
         />
       )}
 
