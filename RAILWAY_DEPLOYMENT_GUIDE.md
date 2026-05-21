@@ -1,5 +1,7 @@
 # 🚀 Railway.app Deployment Guide for Beginners
 
+> **Note (May 2026):** The public demo has been retired. See [docs/DEMO_ARCHIVE.md](docs/DEMO_ARCHIVE.md) and [docs/RAILWAY_TEARDOWN.md](docs/RAILWAY_TEARDOWN.md). This guide is kept for reference and portfolio context.
+
 ## Stirling University Chatbot - Complete Step-by-Step Tutorial
 
 ---

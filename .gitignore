@@ -88,3 +88,6 @@ postgres_data/
 *.tmp
 *.temp
 .cache/
+
+# Playwright MCP session artifacts
+.playwright-mcp/
